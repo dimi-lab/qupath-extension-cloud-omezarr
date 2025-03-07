@@ -3,6 +3,8 @@ plugins {
   id("com.gradleup.shadow") version "8.3.5"
   // QuPath Gradle extension convention plugin
   id("qupath-conventions")
+
+  kotlin("jvm") version "2.1.10"
 }
 
 // TODO: Configure your extension here (please change the defaults!)
@@ -12,6 +14,10 @@ qupathExtension {
   version = "0.1.0-SNAPSHOT"
   description = "QuPath extension to load OME-Zarr images from cloud storage"
   automaticModule = "io.github.dimi-lab.qupath.extension.cloud-omezarr"
+}
+
+kotlin {
+  jvmToolchain(17)
 }
 
 // TODO: Define your dependencies here
@@ -28,5 +34,9 @@ dependencies {
   // For testing
   testImplementation(libs.bundles.qupath)
   testImplementation(libs.junit)
+  implementation(kotlin("stdlib-jdk8"))
 
+}
+repositories {
+  mavenCentral()
 }

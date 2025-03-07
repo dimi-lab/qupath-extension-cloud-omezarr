@@ -48,7 +48,7 @@ public class InterfaceController extends VBox {
         // it may be better to present them all to the user in the main extension GUI,
         // binding them to GUI elements, so they are updated when the user interacts with
         // the GUI, and so that the GUI elements are updated if the preference changes
-        integerOptionSpinner.getValueFactory().valueProperty().bindBidirectional(CloudOmeZarrExtension.integerOptionProperty());
+        integerOptionSpinner.getValueFactory().valueProperty().bindBidirectional(CloudOmeZarrExtension.Companion.getIntegerOption());
         integerOptionSpinner.getValueFactory().valueProperty().addListener((observableValue, oldValue, newValue) -> {
             Dialogs.showInfoNotification(
                     resources.getString("title"),
