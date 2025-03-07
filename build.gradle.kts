@@ -7,11 +7,11 @@ plugins {
 
 // TODO: Configure your extension here (please change the defaults!)
 qupathExtension {
-    name = "qupath-extension-template"
-    group = "io.github.qupath"
+    name = "qupath-extension-cloud-omezarr"
+    group = "io.github.dimilab"
     version = "0.1.0-SNAPSHOT"
-    description = "A simple QuPath extension"
-    automaticModule = "io.github.qupath.extension.template"
+    description = "QuPath extension to load OME-Zarr images from cloud storage"
+    automaticModule = "io.github.dimi-lab.qupath.extension.cloud-omezarr"
 }
 
 // TODO: Define your dependencies here

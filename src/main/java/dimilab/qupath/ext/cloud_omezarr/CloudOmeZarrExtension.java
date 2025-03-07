@@ -1,4 +1,4 @@
-package qupath.ext.template;
+package dimilab.qupath.ext.cloud_omezarr;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
@@ -8,7 +8,7 @@ import javafx.scene.control.MenuItem;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import qupath.ext.template.ui.InterfaceController;
+import dimilab.qupath.ext.cloud_omezarr.ui.InterfaceController;
 import qupath.fx.dialogs.Dialogs;
 import qupath.fx.prefs.controlsfx.PropertyItemBuilder;
 import qupath.lib.common.Version;
@@ -33,25 +33,19 @@ import java.util.ResourceBundle;
  *     /resources/META-INF/services/qupath.lib.gui.extensions.QuPathExtension
  * </pre>
  */
-public class DemoExtension implements QuPathExtension, GitHubProject {
+public class CloudOmeZarrExtension implements QuPathExtension, GitHubProject {
 	// TODO: add and modify strings to this resource bundle as needed
 	/**
 	 * A resource bundle containing all the text used by the extension. This may be useful for translation to other languages.
 	 * Note that this is optional and you can define the text within the code and FXML files that you use.
 	 */
-	private static final ResourceBundle resources = ResourceBundle.getBundle("qupath.ext.template.ui.strings");
-	private static final Logger logger = LoggerFactory.getLogger(DemoExtension.class);
+	private static final ResourceBundle resources = ResourceBundle.getBundle("dimilab.qupath.ext.cloud_omezarr.ui.strings");
+	private static final Logger logger = LoggerFactory.getLogger(CloudOmeZarrExtension.class);
 
-	/**
-	 * Display name for your extension
-	 * TODO: define this
-	 */
+	// Display name
 	private static final String EXTENSION_NAME = resources.getString("name");
 
-	/**
-	 * Short description, used under 'Extensions > Installed extensions'
-	 * TODO: define this
-	 */
+	// Short description
 	private static final String EXTENSION_DESCRIPTION = resources.getString("description");
 
 	/**
@@ -69,7 +63,7 @@ public class DemoExtension implements QuPathExtension, GitHubProject {
 	 * TODO: define this
 	 */
 	private static final GitHubRepo EXTENSION_REPOSITORY = GitHubRepo.create(
-			EXTENSION_NAME, "myGitHubUserName", "myGitHubRepo");
+			EXTENSION_NAME, "dimi-lab", "qupath-extension-cloud-omezarr");
 
 	/**
 	 * Flag whether the extension is already installed (might not be needed... but we'll do it anyway)
