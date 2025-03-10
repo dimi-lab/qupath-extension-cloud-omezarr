@@ -16,6 +16,10 @@ qupathExtension {
   automaticModule = "io.github.dimi-lab.qupath.extension.cloud-omezarr"
 }
 
+tasks.named("build") {
+  dependsOn("shadowJar")
+}
+
 kotlin {
   jvmToolchain(17)
 }
