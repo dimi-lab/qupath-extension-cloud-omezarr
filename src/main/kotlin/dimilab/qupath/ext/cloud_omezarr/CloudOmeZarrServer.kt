@@ -1,5 +1,6 @@
 package dimilab.qupath.ext.cloud_omezarr
 
+import com.bc.zarr.ZarrArray
 import com.bc.zarr.ZarrGroup
 import loci.common.RandomAccessInputStream
 import loci.common.services.ServiceFactory
@@ -38,8 +39,11 @@ class CloudOmeZarrServer(private val zarrBaseUri: URI, vararg args: String) : Ab
     val path: String,
     val width: Int,
     val height: Int,
+    val zarrArray: ZarrArray,
     // TODO: coordinateTransforms
   )
+
+  private val scaleLevels: List<ScaleLevel>
 
   init {
     logger.info("Creating CloudOmeZarrServer from $zarrBaseUri with args ${args.joinToString(" ")}")
@@ -53,7 +57,7 @@ class CloudOmeZarrServer(private val zarrBaseUri: URI, vararg args: String) : Ab
     val omeZarrMetadata = readOmeZarrMetadata(rootZarr)
 
     val imageZarr = rootZarr.openSubGroup(omeZarrMetadata.imageName)
-    val scaleLevels = buildScaleLevels(imageZarr)
+    scaleLevels = buildScaleLevels(imageZarr)
 
     val omeMetadata = omeZarrMetadata.omeXml
     val channels = (0 until omeMetadata.getChannelCount(0)).map { channelNum ->
@@ -62,11 +66,14 @@ class CloudOmeZarrServer(private val zarrBaseUri: URI, vararg args: String) : Ab
       ImageChannel.getInstance(name, color.value)
     }
 
+    val levelsBuilder = ImageResolutionLevel.Builder(scaleLevels[0].width, scaleLevels[0].height)
+    scaleLevels.forEach { levelsBuilder.addLevel(it.width, it.height) }
+
     metadata =
       ImageServerMetadata.Builder()
         .width(scaleLevels[0].width)
         .height(scaleLevels[0].height)
-        .levels(scaleLevels)
+        .levels(levelsBuilder.build())
         .channels(channels)
         // TODO make this the 1st level's tile size
         .preferredTileSize(100, 100).build()
@@ -88,31 +95,31 @@ class CloudOmeZarrServer(private val zarrBaseUri: URI, vararg args: String) : Ab
     )
   }
 
-  private fun buildScaleLevels(imageZarr: ZarrGroup): List<ImageResolutionLevel> {
+  private fun buildScaleLevels(imageZarr: ZarrGroup): List<ScaleLevel> {
     val multiscales = imageZarr.attributes["multiscales"] as ArrayList<*>
     if (multiscales.size != 1) {
       throw IOException("Expected a single multiscale in OME-Zarr, but found ${multiscales.size}")
     }
 
     val scaleLevelDefs = (multiscales[0] as Map<*, *>)["datasets"] as ArrayList<*>
-    val scaleLevelKeys = scaleLevelDefs.map { it as Map<*, *> }.map { it["path"] as String }
 
+    // TODO: get these from axis data
     val xDimension = 3
     val yDimension = 4
 
-    val fullSize = imageZarr.openArray(scaleLevelKeys.first())
-
-    val levelsBuilder = ImageResolutionLevel.Builder(fullSize.shape[xDimension], fullSize.shape[yDimension])
-
-    scaleLevelDefs.forEach {
+    return scaleLevelDefs.map {
       val scaleLevelDef = it as Map<*, *>
       val path = scaleLevelDef["path"] as String
 
       val scaledArray = imageZarr.openArray(path)
-      levelsBuilder.addLevel(scaledArray.shape[xDimension], scaledArray.shape[yDimension])
-    }
 
-    return levelsBuilder.build()
+      ScaleLevel(
+        path = path,
+        width = scaledArray.shape[xDimension],
+        height = scaledArray.shape[yDimension],
+        zarrArray = scaledArray,
+      )
+    }
   }
 
   private fun readOmeXml(uri: URI): String {
