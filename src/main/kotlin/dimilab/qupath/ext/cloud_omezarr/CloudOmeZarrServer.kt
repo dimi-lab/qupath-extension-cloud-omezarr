@@ -1,43 +1,161 @@
 package dimilab.qupath.ext.cloud_omezarr
 
-import qupath.lib.images.servers.AbstractTileableImageServer
-import qupath.lib.images.servers.ImageChannel
-import qupath.lib.images.servers.ImageServerBuilder
+import com.bc.zarr.ZarrGroup
+import loci.common.RandomAccessInputStream
+import loci.common.services.ServiceFactory
+import loci.common.xml.XMLTools
+import loci.formats.ome.OMEXMLMetadata
+import loci.formats.services.OMEXMLService
+import org.xml.sax.SAXException
+import qupath.lib.images.servers.*
 import qupath.lib.images.servers.ImageServerBuilder.DefaultImageServerBuilder
-import qupath.lib.images.servers.ImageServerMetadata
-import qupath.lib.images.servers.TileRequest
+import qupath.lib.images.servers.ImageServerMetadata.ImageResolutionLevel
 import java.awt.Color
 import java.awt.image.BufferedImage
 import java.awt.image.BufferedImage.TYPE_INT_ARGB
-import java.awt.image.BufferedImage.TYPE_INT_RGB
+import java.io.IOException
 import java.net.URI
+import javax.xml.parsers.ParserConfigurationException
+import javax.xml.transform.TransformerException
+import kotlin.io.path.absolutePathString
+import kotlin.io.path.toPath
 
 
-class CloudOmeZarrServer(val uri: URI, vararg args: String) : AbstractTileableImageServer() {
+class CloudOmeZarrServer(private val zarrBaseUri: URI, vararg args: String) : AbstractTileableImageServer() {
   companion object {
     private val logger = org.slf4j.LoggerFactory.getLogger(CloudOmeZarrServer::class.java)
   }
 
+  data class OmeZarrMetadata(
+    val imageName: String,
+    val omeXml: OMEXMLMetadata,
+  )
+
   private val metadata: ImageServerMetadata
   private val serverArgs = args
 
+  data class ScaleLevel(
+    val path: String,
+    val width: Int,
+    val height: Int,
+    // TODO: coordinateTransforms
+  )
+
   init {
-    logger.info("Creating CloudOmeZarrServer from $uri with args ${args.joinToString(" ")}")
+    logger.info("Creating CloudOmeZarrServer from $zarrBaseUri with args ${args.joinToString(" ")}")
 
-    // TODO: implement metadata
+    // Open the Zarray at the root
+    val rootZarr = ZarrGroup.open(zarrBaseUri.toPath())
+    if (rootZarr.attributes["bioformats2raw.layout"] != 3) {
+      throw IOException("Expected a Zarr array with layout 3, but found ${rootZarr.attributes["bioformats2raw.layout"]}")
+    }
 
-    // hardcoded values for now:
-    metadata = ImageServerMetadata.Builder()
-      .width(1000)
-      .height(1000)
-      .levelsFromDownsamples(1.0)
-      .channels(ImageChannel.getDefaultRGBChannels())
-      .preferredTileSize(100, 100)
-      .build()
+    val omeZarrMetadata = readOmeZarrMetadata(rootZarr)
+
+    val imageZarr = rootZarr.openSubGroup(omeZarrMetadata.imageName)
+    val scaleLevels = buildScaleLevels(imageZarr)
+
+    val omeMetadata = omeZarrMetadata.omeXml
+    val channels = (0 until omeMetadata.getChannelCount(0)).map { channelNum ->
+      val name = omeMetadata.getChannelName(0, channelNum)
+      val color = omeMetadata.getChannelColor(0, channelNum)
+      ImageChannel.getInstance(name, color.value)
+    }
+
+    metadata =
+      ImageServerMetadata.Builder()
+        .width(scaleLevels[0].width)
+        .height(scaleLevels[0].height)
+        .levels(scaleLevels)
+        .channels(channels)
+        // TODO make this the 1st level's tile size
+        .preferredTileSize(100, 100).build()
+  }
+
+  private fun readOmeZarrMetadata(omezarr: ZarrGroup): OmeZarrMetadata {
+    val metadataZarr = omezarr.openSubGroup("OME")
+    val imageNames = metadataZarr.attributes["series"] as List<*>
+    if (imageNames.size != 1) {
+      throw IOException("Expected a single image in OME-Zarr, but found: $imageNames")
+    }
+
+    val omeBaseUri = zarrBaseUri.resolve("OME/")
+    val omeMetadata = parseOmeXmlMetadata(omeBaseUri)
+
+    return OmeZarrMetadata(
+      imageName = imageNames[0] as String,
+      omeXml = omeMetadata,
+    )
+  }
+
+  private fun buildScaleLevels(imageZarr: ZarrGroup): List<ImageResolutionLevel> {
+    val multiscales = imageZarr.attributes["multiscales"] as ArrayList<*>
+    if (multiscales.size != 1) {
+      throw IOException("Expected a single multiscale in OME-Zarr, but found ${multiscales.size}")
+    }
+
+    val scaleLevelDefs = (multiscales[0] as Map<*, *>)["datasets"] as ArrayList<*>
+    val scaleLevelKeys = scaleLevelDefs.map { it as Map<*, *> }.map { it["path"] as String }
+
+    val xDimension = 3
+    val yDimension = 4
+
+    val fullSize = imageZarr.openArray(scaleLevelKeys.first())
+
+    val levelsBuilder = ImageResolutionLevel.Builder(fullSize.shape[xDimension], fullSize.shape[yDimension])
+
+    scaleLevelDefs.forEach {
+      val scaleLevelDef = it as Map<*, *>
+      val path = scaleLevelDef["path"] as String
+
+      val scaledArray = imageZarr.openArray(path)
+      levelsBuilder.addLevel(scaledArray.shape[xDimension], scaledArray.shape[yDimension])
+    }
+
+    return levelsBuilder.build()
+  }
+
+  private fun readOmeXml(uri: URI): String {
+    val metadataFilePath = uri.toPath()
+
+    val omeDocument = try {
+      val measurement = RandomAccessInputStream(metadataFilePath.absolutePathString())
+      XMLTools.parseDOM(measurement)
+    } catch (e: ParserConfigurationException) {
+      throw IOException(e)
+    } catch (e: SAXException) {
+      throw IOException(e)
+    }
+    omeDocument.documentElement.normalize()
+
+    try {
+      return XMLTools.getXML(omeDocument)
+    } catch (e: TransformerException) {
+      // logger vs throw?
+      throw IOException(e)
+    }
+  }
+
+  private fun parseOmeXmlMetadata(omeRoot: URI): OMEXMLMetadata {
+    assert(omeRoot.path.endsWith("/"))
+
+    val xml = readOmeXml(omeRoot.resolve("METADATA.ome.xml"))
+
+    val service = ServiceFactory().getInstance(OMEXMLService::class.java)
+    val omeXmlMetadata = service.createOMEXMLMetadata(xml)
+
+    if (omeXmlMetadata.imageCount != 1) {
+      throw IOException("Expected a single image in OME-Zarr, but found ${omeXmlMetadata.imageCount}")
+    }
+    if (omeXmlMetadata.plateCount != 0) {
+      throw IOException("Can't handle plates")
+    }
+
+    return omeXmlMetadata
   }
 
   override fun getURIs(): MutableCollection<URI> {
-    return arrayListOf(uri)
+    return arrayListOf(zarrBaseUri)
   }
 
   override fun getServerType(): String {
@@ -52,13 +170,13 @@ class CloudOmeZarrServer(val uri: URI, vararg args: String) : AbstractTileableIm
     return DefaultImageServerBuilder.createInstance(
       CloudOmeZarrServerBuilder::class.java,
       metadata,
-      uri,
+      zarrBaseUri,
       *serverArgs,
     )
   }
 
   override fun createID(): String {
-    return "CloudOmeZarrServer: $uri ${serverArgs.joinToString(" ")}"
+    return "CloudOmeZarrServer: $zarrBaseUri ${serverArgs.joinToString(" ")}"
   }
 
   override fun readTile(tileRequest: TileRequest?): BufferedImage {

@@ -7,7 +7,15 @@ plugins {
   kotlin("jvm") version "2.1.10"
 }
 
-// TODO: Configure your extension here (please change the defaults!)
+repositories {
+  mavenCentral()
+
+  maven {
+    name = "Maven SciJava"
+    url = uri("https://maven.scijava.org/content/groups/public")
+  }
+}
+
 qupathExtension {
   name = "qupath-extension-cloud-omezarr"
   group = "io.github.dimilab"
@@ -24,23 +32,29 @@ kotlin {
   jvmToolchain(17)
 }
 
-// TODO: Define your dependencies here
 dependencies {
+  implementation(kotlin("stdlib-jdk8"))
 
   // Main dependencies for most QuPath extensions
   shadow(libs.bundles.qupath)
   shadow(libs.bundles.logging)
   shadow(libs.qupath.fxtras)
 
-  // If you aren't using Groovy, this can be removed
-  shadow(libs.bundles.groovy)
+  // OME + Zarr
+  implementation("ome:formats-api:8.1.0")
+  implementation("ome:formats-common:5.2.4")
+  implementation("org.openmicroscopy:ome-model:6.4.0")
+  implementation("dev.zarr:jzarr:0.4.2")
 
   // For testing
   testImplementation(libs.bundles.qupath)
-  testImplementation(libs.junit)
-  implementation(kotlin("stdlib-jdk8"))
-
+  testImplementation(kotlin("test"))
 }
+
 repositories {
   mavenCentral()
+}
+
+tasks.test {
+  useJUnitPlatform()
 }

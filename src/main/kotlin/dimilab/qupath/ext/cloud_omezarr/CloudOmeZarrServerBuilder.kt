@@ -23,7 +23,7 @@ class CloudOmeZarrServerBuilder : ImageServerBuilder<BufferedImage> {
     }
 
     // TODO: look for an omezarr structure at the URI
-    if (!uri.path.endsWith(".zattrs")) {
+    if (!uri.path.endsWith(".zattrs") && !uri.path.endsWith(".zarr/")) {
       return null
     }
 
