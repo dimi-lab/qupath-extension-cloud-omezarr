@@ -14,8 +14,8 @@ class CloudOmeZarrServerTest {
       zarrBaseUri = testZarrRootUri
     )
 
-    assertEquals(1050, server.width)
-    assertEquals(1401, server.height)
+    assertEquals(1401, server.width)
+    assertEquals(1050, server.height)
 
     assertEquals(4, server.nResolutions())
     assertEquals(1, server.getDownsampleForResolution(0).roundToInt())

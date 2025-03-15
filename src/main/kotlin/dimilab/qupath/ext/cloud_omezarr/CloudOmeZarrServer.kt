@@ -107,8 +107,8 @@ class CloudOmeZarrServer(private val zarrBaseUri: URI, vararg args: String) : Ab
     val scaleLevelDefs = (multiscales[0] as Map<*, *>)["datasets"] as ArrayList<*>
 
     // TODO: get these from axis data
-    val xDimension = 3
-    val yDimension = 4
+    val xDimension = 4
+    val yDimension = 3
 
     return scaleLevelDefs.map {
       val scaleLevelDef = it as Map<*, *>

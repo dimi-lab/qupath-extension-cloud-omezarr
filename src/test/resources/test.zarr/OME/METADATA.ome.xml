@@ -12,7 +12,7 @@
         <ObjectiveSettings ID="Objective:0:0"/>
         <Pixels BigEndian="true" DimensionOrder="XYZCT" ID="Pixels:0" Interleaved="false"
                 PhysicalSizeX="0.49799447890790055" PhysicalSizeXUnit="µm" PhysicalSizeY="0.49799447890790055"
-                PhysicalSizeYUnit="µm" SignificantBits="32" SizeC="8" SizeT="1" SizeX="5604" SizeY="4200" SizeZ="1"
+                PhysicalSizeYUnit="µm" SignificantBits="32" SizeC="8" SizeT="1" SizeX="1050" SizeY="1401" SizeZ="1"
                 Type="float">
             <Channel Color="-16776961" ID="Channel:0:0" Name="PDL1 (Opal 520)" SamplesPerPixel="1">
                 <LightPath/>
