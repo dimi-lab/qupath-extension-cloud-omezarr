@@ -60,11 +60,7 @@ class CloudOmeZarrServer(private val zarrBaseUri: URI, vararg args: String) : Ab
     scaleLevels = buildScaleLevels(imageZarr)
 
     val omeMetadata = omeZarrMetadata.omeXml
-    val channels = (0 until omeMetadata.getChannelCount(0)).map { channelNum ->
-      val name = omeMetadata.getChannelName(0, channelNum)
-      val color = omeMetadata.getChannelColor(0, channelNum)
-      ImageChannel.getInstance(name, color.value)
-    }
+    val channels = omeChannelsToQuPath(omeMetadata)
 
     val levelsBuilder = ImageResolutionLevel.Builder(scaleLevels[0].width, scaleLevels[0].height)
     scaleLevels.forEach { levelsBuilder.addLevel(it.width, it.height) }
@@ -88,6 +84,13 @@ class CloudOmeZarrServer(private val zarrBaseUri: URI, vararg args: String) : Ab
 
     val omeBaseUri = zarrBaseUri.resolve("OME/")
     val omeMetadata = parseOmeXmlMetadata(omeBaseUri)
+
+    if (omeMetadata.imageCount != 1) {
+      throw IOException("Expected a single image in OME-Zarr, but found ${omeMetadata.imageCount}")
+    }
+    if (omeMetadata.plateCount != 0) {
+      throw IOException("Can't handle plates")
+    }
 
     return OmeZarrMetadata(
       imageName = imageNames[0] as String,
@@ -120,45 +123,6 @@ class CloudOmeZarrServer(private val zarrBaseUri: URI, vararg args: String) : Ab
         zarrArray = scaledArray,
       )
     }
-  }
-
-  private fun readOmeXml(uri: URI): String {
-    val metadataFilePath = uri.toPath()
-
-    val omeDocument = try {
-      val measurement = RandomAccessInputStream(metadataFilePath.absolutePathString())
-      XMLTools.parseDOM(measurement)
-    } catch (e: ParserConfigurationException) {
-      throw IOException(e)
-    } catch (e: SAXException) {
-      throw IOException(e)
-    }
-    omeDocument.documentElement.normalize()
-
-    try {
-      return XMLTools.getXML(omeDocument)
-    } catch (e: TransformerException) {
-      // logger vs throw?
-      throw IOException(e)
-    }
-  }
-
-  private fun parseOmeXmlMetadata(omeRoot: URI): OMEXMLMetadata {
-    assert(omeRoot.path.endsWith("/"))
-
-    val xml = readOmeXml(omeRoot.resolve("METADATA.ome.xml"))
-
-    val service = ServiceFactory().getInstance(OMEXMLService::class.java)
-    val omeXmlMetadata = service.createOMEXMLMetadata(xml)
-
-    if (omeXmlMetadata.imageCount != 1) {
-      throw IOException("Expected a single image in OME-Zarr, but found ${omeXmlMetadata.imageCount}")
-    }
-    if (omeXmlMetadata.plateCount != 0) {
-      throw IOException("Can't handle plates")
-    }
-
-    return omeXmlMetadata
   }
 
   override fun getURIs(): MutableCollection<URI> {
