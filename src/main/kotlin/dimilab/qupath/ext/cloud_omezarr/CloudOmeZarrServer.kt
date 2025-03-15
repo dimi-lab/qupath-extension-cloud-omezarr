@@ -2,23 +2,18 @@ package dimilab.qupath.ext.cloud_omezarr
 
 import com.bc.zarr.ZarrArray
 import com.bc.zarr.ZarrGroup
-import loci.common.RandomAccessInputStream
-import loci.common.services.ServiceFactory
-import loci.common.xml.XMLTools
 import loci.formats.ome.OMEXMLMetadata
-import loci.formats.services.OMEXMLService
-import org.xml.sax.SAXException
-import qupath.lib.images.servers.*
+import qupath.lib.color.ColorModelFactory
+import qupath.lib.images.servers.AbstractTileableImageServer
+import qupath.lib.images.servers.ImageServerBuilder
 import qupath.lib.images.servers.ImageServerBuilder.DefaultImageServerBuilder
+import qupath.lib.images.servers.ImageServerMetadata
 import qupath.lib.images.servers.ImageServerMetadata.ImageResolutionLevel
-import java.awt.Color
+import qupath.lib.images.servers.TileRequest
 import java.awt.image.BufferedImage
-import java.awt.image.BufferedImage.TYPE_INT_ARGB
+import java.awt.image.ColorModel
 import java.io.IOException
 import java.net.URI
-import javax.xml.parsers.ParserConfigurationException
-import javax.xml.transform.TransformerException
-import kotlin.io.path.absolutePathString
 import kotlin.io.path.toPath
 
 
@@ -39,11 +34,17 @@ class CloudOmeZarrServer(private val zarrBaseUri: URI, vararg args: String) : Ab
     val path: String,
     val width: Int,
     val height: Int,
+    val tileWidth: Int,
+    val tileHeight: Int,
     val zarrArray: ZarrArray,
     // TODO: coordinateTransforms
   )
 
+  // The image has several levels of detail.
   private val scaleLevels: List<ScaleLevel>
+
+  // The color model converts n-channel pixels into RGB values.
+  private val colorModel: ColorModel
 
   init {
     logger.info("Creating CloudOmeZarrServer from $zarrBaseUri with args ${args.joinToString(" ")}")
@@ -62,6 +63,11 @@ class CloudOmeZarrServer(private val zarrBaseUri: URI, vararg args: String) : Ab
     val omeMetadata = omeZarrMetadata.omeXml
     val channels = omeChannelsToQuPath(omeMetadata)
 
+    val omePixelType = omeMetadata.getPixelsType(0)
+    checkPixelType(omePixelType, omeMetadata.getPixelsBigEndian(0), scaleLevels)
+    val pixelType = omeXmlPixelTypeToQupath(omePixelType)
+    colorModel = ColorModelFactory.createColorModel(pixelType, channels)
+
     val levelsBuilder = ImageResolutionLevel.Builder(scaleLevels[0].width, scaleLevels[0].height)
     scaleLevels.forEach { levelsBuilder.addLevel(it.width, it.height) }
 
@@ -70,9 +76,9 @@ class CloudOmeZarrServer(private val zarrBaseUri: URI, vararg args: String) : Ab
         .width(scaleLevels[0].width)
         .height(scaleLevels[0].height)
         .levels(levelsBuilder.build())
+        .pixelType(pixelType)
         .channels(channels)
-        // TODO make this the 1st level's tile size
-        .preferredTileSize(100, 100).build()
+        .preferredTileSize(scaleLevels[0].tileWidth, scaleLevels[0].tileHeight).build()
   }
 
   private fun readOmeZarrMetadata(omezarr: ZarrGroup): OmeZarrMetadata {
@@ -120,6 +126,8 @@ class CloudOmeZarrServer(private val zarrBaseUri: URI, vararg args: String) : Ab
         path = path,
         width = scaledArray.shape[xDimension],
         height = scaledArray.shape[yDimension],
+        tileWidth = scaledArray.chunks[xDimension],
+        tileHeight = scaledArray.chunks[yDimension],
         zarrArray = scaledArray,
       )
     }
@@ -151,26 +159,32 @@ class CloudOmeZarrServer(private val zarrBaseUri: URI, vararg args: String) : Ab
   }
 
   override fun readTile(tileRequest: TileRequest?): BufferedImage {
-    // TODO: implement tile reading
-
-    logger.debug("Reading tile: {}", tileRequest)
-
-    val width = tileRequest!!.tileWidth
-    val height = tileRequest.tileHeight
-
-    val img = BufferedImage(width, height, TYPE_INT_ARGB)
-
-    val rgb = Color(255, 0, 255).rgb
-    val startW = (width * 0.1).toInt()
-    val endW = (width * 0.9).toInt()
-    val startH = (height * 0.1).toInt()
-    val endH = (height * 0.9).toInt()
-    (startW..endW).forEach { x ->
-      (startH..endH).forEach { y ->
-        img.setRGB(x, y, rgb)
-      }
+    if (tileRequest == null) {
+      throw IllegalArgumentException("Tile request cannot be null")
+    }
+    if (tileRequest.level < 0 || tileRequest.level >= scaleLevels.size) {
+      throw IllegalArgumentException("Tile level ${tileRequest.level} out of bounds for ${scaleLevels.size} levels")
     }
 
-    return img
+    logger.debug(
+      "Reading tile x={} y={} width={} height={} level={} channels={}",
+      tileRequest.tileX,
+      tileRequest.tileY,
+      tileRequest.tileWidth,
+      tileRequest.tileHeight,
+      tileRequest.level,
+      metadata.channels.size
+    )
+
+    return renderZarrToBufferedImage(
+      scaleLevels[tileRequest.level].zarrArray,
+      colorModel,
+      tileRequest.tileX,
+      tileRequest.tileY,
+      tileRequest.tileWidth,
+      tileRequest.tileHeight,
+      metadata.pixelType,
+      metadata.channels.size
+    )
   }
 }

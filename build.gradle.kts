@@ -35,6 +35,8 @@ kotlin {
 dependencies {
   implementation(kotlin("stdlib-jdk8"))
 
+  implementation("net.java.dev.jna:jna:5.16.0")
+
   // Main dependencies for most QuPath extensions
   shadow(libs.bundles.qupath)
   shadow(libs.bundles.logging)

@@ -1,6 +1,7 @@
 package dimilab.qupath.ext.cloud_omezarr
 
 import junit.framework.TestCase.assertEquals
+import qupath.lib.images.servers.PixelType
 import kotlin.math.roundToInt
 import kotlin.test.Test
 
@@ -26,5 +27,17 @@ class CloudOmeZarrServerTest {
     assertEquals(8, server.nChannels())
     val names = listOf("PDL1 (Opal 520)", "CD8 (Opal 540)", "FoxP3 (Opal 570)", "CD68 (Opal 620)", "PD1 (Opal 650)", "CK (Opal 690)", "DAPI", "Autofluorescence")
     assertEquals(names, (0 until server.nChannels()).map { server.getChannel(it).name })
+
+    assertEquals(PixelType.FLOAT32, server.pixelType)
+  }
+
+  @Test
+  fun testReadTile() {
+    val server = CloudOmeZarrServer(
+      zarrBaseUri = testZarrRootUri
+    )
+
+    val result = server.readRegion(1.0, 0, 0, 100, 100)
+    assertEquals(8, result.raster.numBands)
   }
 }

@@ -1,10 +1,13 @@
 package dimilab.qupath.ext.cloud_omezarr
 
+import dimilab.qupath.ext.cloud_omezarr.OmeXmlUtils.Companion.logger
 import loci.common.RandomAccessInputStream
 import loci.common.services.ServiceFactory
 import loci.common.xml.XMLTools
 import loci.formats.ome.OMEXMLMetadata
 import loci.formats.services.OMEXMLService
+import ome.xml.model.enums.PixelType
+import org.slf4j.Logger
 import org.xml.sax.SAXException
 import qupath.lib.common.ColorTools
 import qupath.lib.images.servers.ImageChannel
@@ -15,6 +18,12 @@ import javax.xml.transform.TransformerException
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.toPath
 
+
+class OmeXmlUtils {
+  companion object {
+    val logger: Logger = org.slf4j.LoggerFactory.getLogger(OmeZarrUtils::class.java)
+  }
+}
 
 fun parseOmeXmlMetadata(omeRoot: URI): OMEXMLMetadata {
   assert(omeRoot.path.endsWith("/"))
@@ -53,5 +62,34 @@ fun omeChannelsToQuPath(omeMetadata: OMEXMLMetadata): List<ImageChannel> {
     val color = omeMetadata.getChannelColor(0, channelNum)
     val colorVal = ColorTools.packARGB(color.alpha, color.red, color.green, color.blue)
     ImageChannel.getInstance(name, colorVal)
+  }
+}
+
+fun omeXmlPixelTypeToQupath(omeXmlPixelType: PixelType): qupath.lib.images.servers.PixelType {
+  when (omeXmlPixelType) {
+    PixelType.BIT -> {
+      logger.warn("Pixel type is BIT! This is not currently supported by QuPath.")
+      return qupath.lib.images.servers.PixelType.UINT8
+    }
+
+    PixelType.INT8 -> {
+      logger.warn("Pixel type is INT8! This is not currently supported by QuPath.")
+      return qupath.lib.images.servers.PixelType.INT8
+    }
+
+    PixelType.UINT8 -> return qupath.lib.images.servers.PixelType.UINT8
+    PixelType.INT16 -> return qupath.lib.images.servers.PixelType.INT16
+    PixelType.UINT16 -> return qupath.lib.images.servers.PixelType.UINT16
+
+    PixelType.INT32 -> return qupath.lib.images.servers.PixelType.INT32
+    PixelType.UINT32 -> {
+      logger.warn("Pixel type is UINT32! This is not currently supported by QuPath.")
+      return qupath.lib.images.servers.PixelType.UINT32
+    }
+
+    PixelType.FLOAT -> return qupath.lib.images.servers.PixelType.FLOAT32
+    PixelType.DOUBLE -> return qupath.lib.images.servers.PixelType.FLOAT64
+
+    else -> throw IllegalArgumentException("Unsupported pixel type: $omeXmlPixelType")
   }
 }
