@@ -1,0 +1,1217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OME xmlns="http://www.openmicroscopy.org/Schemas/OME/2016-06" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     Creator="OME Bio-Formats 6.7.0" UUID="urn:uuid:913428a1-535d-440a-9edb-32bf817a87c0"
+     xsi:schemaLocation="http://www.openmicroscopy.org/Schemas/OME/2016-06 http://www.openmicroscopy.org/Schemas/OME/2016-06/ome.xsd">
+    <Instrument ID="Instrument:0">
+        <Objective ID="Objective:0:0" Model="10x [10x]" NominalMagnification="10.0"/>
+    </Instrument>
+    <Image ID="Image:0" Name="resolution #1">
+        <AcquisitionDate>2017-10-05T09:53:39</AcquisitionDate>
+        <Description/>
+        <InstrumentRef ID="Instrument:0"/>
+        <ObjectiveSettings ID="Objective:0:0"/>
+        <Pixels BigEndian="true" DimensionOrder="XYZCT" ID="Pixels:0" Interleaved="false"
+                PhysicalSizeX="0.49799447890790055" PhysicalSizeXUnit="µm" PhysicalSizeY="0.49799447890790055"
+                PhysicalSizeYUnit="µm" SignificantBits="32" SizeC="8" SizeT="1" SizeX="1050" SizeY="1401" SizeZ="1"
+                Type="float">
+            <Channel Color="-16776961" ID="Channel:0:0" Name="PDL1 (Opal 520)" SamplesPerPixel="1">
+                <LightPath/>
+            </Channel>
+            <Channel Color="-65281" ID="Channel:0:1" Name="CD8 (Opal 540)" SamplesPerPixel="1">
+                <LightPath/>
+            </Channel>
+            <Channel Color="-8388353" ID="Channel:0:2" Name="FoxP3 (Opal 570)" SamplesPerPixel="1">
+                <LightPath/>
+            </Channel>
+            <Channel Color="-16711681" ID="Channel:0:3" Name="CD68 (Opal 620)" SamplesPerPixel="1">
+                <LightPath/>
+            </Channel>
+            <Channel Color="16711935" ID="Channel:0:4" Name="PD1 (Opal 650)" SamplesPerPixel="1">
+                <LightPath/>
+            </Channel>
+            <Channel Color="16777215" ID="Channel:0:5" Name="CK (Opal 690)" SamplesPerPixel="1">
+                <LightPath/>
+            </Channel>
+            <Channel Color="65535" ID="Channel:0:6" Name="DAPI" SamplesPerPixel="1">
+                <LightPath/>
+            </Channel>
+            <Channel Color="255" ID="Channel:0:7" Name="Autofluorescence" SamplesPerPixel="1">
+                <LightPath/>
+            </Channel>
+            <MetadataOnly/>
+            <Plane ExposureTime="0.0" ExposureTimeUnit="µs" PositionX="16176.745893001604" PositionXUnit="µm"
+                   PositionY="59127.02566000157" PositionYUnit="µm" TheC="0" TheT="0" TheZ="0"/>
+            <Plane ExposureTime="0.0" ExposureTimeUnit="µs" PositionX="16176.745893001604" PositionXUnit="µm"
+                   PositionY="59127.02566000157" PositionYUnit="µm" TheC="1" TheT="0" TheZ="0"/>
+            <Plane ExposureTime="0.0" ExposureTimeUnit="µs" PositionX="16176.745893001604" PositionXUnit="µm"
+                   PositionY="59127.02566000157" PositionYUnit="µm" TheC="2" TheT="0" TheZ="0"/>
+            <Plane ExposureTime="0.0" ExposureTimeUnit="µs" PositionX="16176.745893001604" PositionXUnit="µm"
+                   PositionY="59127.02566000157" PositionYUnit="µm" TheC="3" TheT="0" TheZ="0"/>
+            <Plane ExposureTime="0.0" ExposureTimeUnit="µs" PositionX="16176.745893001604" PositionXUnit="µm"
+                   PositionY="59127.02566000157" PositionYUnit="µm" TheC="4" TheT="0" TheZ="0"/>
+            <Plane ExposureTime="0.0" ExposureTimeUnit="µs" PositionX="16176.745893001604" PositionXUnit="µm"
+                   PositionY="59127.02566000157" PositionYUnit="µm" TheC="5" TheT="0" TheZ="0"/>
+            <Plane ExposureTime="0.0" ExposureTimeUnit="µs" PositionX="16176.745893001604" PositionXUnit="µm"
+                   PositionY="59127.02566000157" PositionYUnit="µm" TheC="6" TheT="0" TheZ="0"/>
+            <Plane ExposureTime="0.0" ExposureTimeUnit="µs" PositionX="16176.745893001604" PositionXUnit="µm"
+                   PositionY="59127.02566000157" PositionYUnit="µm" TheC="7" TheT="0" TheZ="0"/>
+        </Pixels>
+    </Image>
+    <StructuredAnnotations>
+        <XMLAnnotation ID="Annotation:0" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>SignalUnits</Key>
+                    <Value>[33, 33, 33, 33, 33, 33, 33, 33]</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:1" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>ComputerName</Key>
+                    <Value>[HOPLL527, HOPLL527, HOPLL527, HOPLL527, HOPLL527, HOPLL527, HOPLL527, HOPLL527]</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:2" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>SMinSampleValue</Key>
+                    <Value>0</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:3" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>XResolution</Key>
+                    <Value>20080.543908699452</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:4" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>TileWidth</Key>
+                    <Value>512</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:5" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>TileOffsets</Key>
+                    <Value>25352185</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:6" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>YResolution</Key>
+                    <Value>20080.543908699452</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:7" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>BitsPerSample</Key>
+                    <Value>32</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:8" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>Software</Key>
+                    <Value>PerkinElmer-QPI</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:9" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>Identifier</Key>
+                    <Value>[0e486e0b-2511-4856-9852-c8be1915362d, 0e486e0b-2511-4856-9852-c8be1915362d,
+                        0e486e0b-2511-4856-9852-c8be1915362d, 0e486e0b-2511-4856-9852-c8be1915362d,
+                        0e486e0b-2511-4856-9852-c8be1915362d, 0e486e0b-2511-4856-9852-c8be1915362d,
+                        0e486e0b-2511-4856-9852-c8be1915362d, 0e486e0b-2511-4856-9852-c8be1915362d]
+                    </Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:10" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>Color</Key>
+                    <Value>[255,0,0, 255,255,0, 255,128,0, 255,0,255, 0,255,0, 0,255,255, 0,0,255, 0,0,0]</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:11" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>PhotometricInterpretation</Key>
+                    <Value>BlackIsZero</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:12" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>NewSubfileType</Key>
+                    <Value>0</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:13" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>Objective</Key>
+                    <Value>[10x [10x], 10x [10x], 10x [10x], 10x [10x], 10x [10x], 10x [10x], 10x [10x], 10x [10x]]
+                    </Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:14" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>ImageWidth</Key>
+                    <Value>5604</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:15" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>YPosition</Key>
+                    <Value>5.912702566000157</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:16" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>SampleFormat</Key>
+                    <Value>IEEE floating point</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:17" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>AcquisitionSoftware</Key>
+                    <Value>[Jenga, Jenga, Jenga, Jenga, Jenga, Jenga, Jenga, Jenga]</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:18" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>Responsivity</Key>
+                    <Value>[
+
+                        DAPI
+                        14.9368283928811
+                        2017-09-25T18:55:00.9465418Z
+                        Semrock:FF02-409/LP-25 Emission / Semrock:FF01-387/11-25 Excitation
+
+
+                        FITC or AF488
+                        152.7751358502
+                        2017-09-22T13:27:17.2505546Z
+                        Chroma:ET510LP Emission / Chroma:ET480/40x Excitation
+
+
+                        Cy3 or TRITC
+                        5.13087381616339
+                        2017-09-22T13:30:27.4364090Z
+                        Chroma:HQ572LP Emission / Chroma:HQ545/30x Excitation
+
+
+                        Texas Red or AF594
+                        0.204841067251092
+                        2017-09-22T14:38:30.8895713Z
+                        Semrock:FF01-657/106-25 Emission / Semrock:FF01-578/22-25 Excitation
+
+
+                        Cy5 or AF647
+                        0.00877244936874489
+                        2017-09-22T13:37:37.8905894Z
+                        Chroma:ET700/75m Emission / Chroma:ET620/60x Excitation
+
+                        ,
+
+                        DAPI
+                        14.9368283928811
+                        2017-09-25T18:55:00.9465418Z
+                        Semrock:FF02-409/LP-25 Emission / Semrock:FF01-387/11-25 Excitation
+
+
+                        FITC or AF488
+                        152.7751358502
+                        2017-09-22T13:27:17.2505546Z
+                        Chroma:ET510LP Emission / Chroma:ET480/40x Excitation
+
+
+                        Cy3 or TRITC
+                        5.13087381616339
+                        2017-09-22T13:30:27.4364090Z
+                        Chroma:HQ572LP Emission / Chroma:HQ545/30x Excitation
+
+
+                        Texas Red or AF594
+                        0.204841067251092
+                        2017-09-22T14:38:30.8895713Z
+                        Semrock:FF01-657/106-25 Emission / Semrock:FF01-578/22-25 Excitation
+
+
+                        Cy5 or AF647
+                        0.00877244936874489
+                        2017-09-22T13:37:37.8905894Z
+                        Chroma:ET700/75m Emission / Chroma:ET620/60x Excitation
+
+                        ,
+
+                        DAPI
+                        14.9368283928811
+                        2017-09-25T18:55:00.9465418Z
+                        Semrock:FF02-409/LP-25 Emission / Semrock:FF01-387/11-25 Excitation
+
+
+                        FITC or AF488
+                        152.7751358502
+                        2017-09-22T13:27:17.2505546Z
+                        Chroma:ET510LP Emission / Chroma:ET480/40x Excitation
+
+
+                        Cy3 or TRITC
+                        5.13087381616339
+                        2017-09-22T13:30:27.4364090Z
+                        Chroma:HQ572LP Emission / Chroma:HQ545/30x Excitation
+
+
+                        Texas Red or AF594
+                        0.204841067251092
+                        2017-09-22T14:38:30.8895713Z
+                        Semrock:FF01-657/106-25 Emission / Semrock:FF01-578/22-25 Excitation
+
+
+                        Cy5 or AF647
+                        0.00877244936874489
+                        2017-09-22T13:37:37.8905894Z
+                        Chroma:ET700/75m Emission / Chroma:ET620/60x Excitation
+
+                        ,
+
+                        DAPI
+                        14.9368283928811
+                        2017-09-25T18:55:00.9465418Z
+                        Semrock:FF02-409/LP-25 Emission / Semrock:FF01-387/11-25 Excitation
+
+
+                        FITC or AF488
+                        152.7751358502
+                        2017-09-22T13:27:17.2505546Z
+                        Chroma:ET510LP Emission / Chroma:ET480/40x Excitation
+
+
+                        Cy3 or TRITC
+                        5.13087381616339
+                        2017-09-22T13:30:27.4364090Z
+                        Chroma:HQ572LP Emission / Chroma:HQ545/30x Excitation
+
+
+                        Texas Red or AF594
+                        0.204841067251092
+                        2017-09-22T14:38:30.8895713Z
+                        Semrock:FF01-657/106-25 Emission / Semrock:FF01-578/22-25 Excitation
+
+
+                        Cy5 or AF647
+                        0.00877244936874489
+                        2017-09-22T13:37:37.8905894Z
+                        Chroma:ET700/75m Emission / Chroma:ET620/60x Excitation
+
+                        ,
+
+                        DAPI
+                        14.9368283928811
+                        2017-09-25T18:55:00.9465418Z
+                        Semrock:FF02-409/LP-25 Emission / Semrock:FF01-387/11-25 Excitation
+
+
+                        FITC or AF488
+                        152.7751358502
+                        2017-09-22T13:27:17.2505546Z
+                        Chroma:ET510LP Emission / Chroma:ET480/40x Excitation
+
+
+                        Cy3 or TRITC
+                        5.13087381616339
+                        2017-09-22T13:30:27.4364090Z
+                        Chroma:HQ572LP Emission / Chroma:HQ545/30x Excitation
+
+
+                        Texas Red or AF594
+                        0.204841067251092
+                        2017-09-22T14:38:30.8895713Z
+                        Semrock:FF01-657/106-25 Emission / Semrock:FF01-578/22-25 Excitation
+
+
+                        Cy5 or AF647
+                        0.00877244936874489
+                        2017-09-22T13:37:37.8905894Z
+                        Chroma:ET700/75m Emission / Chroma:ET620/60x Excitation
+
+                        ,
+
+                        DAPI
+                        14.9368283928811
+                        2017-09-25T18:55:00.9465418Z
+                        Semrock:FF02-409/LP-25 Emission / Semrock:FF01-387/11-25 Excitation
+
+
+                        FITC or AF488
+                        152.7751358502
+                        2017-09-22T13:27:17.2505546Z
+                        Chroma:ET510LP Emission / Chroma:ET480/40x Excitation
+
+
+                        Cy3 or TRITC
+                        5.13087381616339
+                        2017-09-22T13:30:27.4364090Z
+                        Chroma:HQ572LP Emission / Chroma:HQ545/30x Excitation
+
+
+                        Texas Red or AF594
+                        0.204841067251092
+                        2017-09-22T14:38:30.8895713Z
+                        Semrock:FF01-657/106-25 Emission / Semrock:FF01-578/22-25 Excitation
+
+
+                        Cy5 or AF647
+                        0.00877244936874489
+                        2017-09-22T13:37:37.8905894Z
+                        Chroma:ET700/75m Emission / Chroma:ET620/60x Excitation
+
+                        ,
+
+                        DAPI
+                        14.9368283928811
+                        2017-09-25T18:55:00.9465418Z
+                        Semrock:FF02-409/LP-25 Emission / Semrock:FF01-387/11-25 Excitation
+
+
+                        FITC or AF488
+                        152.7751358502
+                        2017-09-22T13:27:17.2505546Z
+                        Chroma:ET510LP Emission / Chroma:ET480/40x Excitation
+
+
+                        Cy3 or TRITC
+                        5.13087381616339
+                        2017-09-22T13:30:27.4364090Z
+                        Chroma:HQ572LP Emission / Chroma:HQ545/30x Excitation
+
+
+                        Texas Red or AF594
+                        0.204841067251092
+                        2017-09-22T14:38:30.8895713Z
+                        Semrock:FF01-657/106-25 Emission / Semrock:FF01-578/22-25 Excitation
+
+
+                        Cy5 or AF647
+                        0.00877244936874489
+                        2017-09-22T13:37:37.8905894Z
+                        Chroma:ET700/75m Emission / Chroma:ET620/60x Excitation
+
+                        ,
+
+                        DAPI
+                        14.9368283928811
+                        2017-09-25T18:55:00.9465418Z
+                        Semrock:FF02-409/LP-25 Emission / Semrock:FF01-387/11-25 Excitation
+
+
+                        FITC or AF488
+                        152.7751358502
+                        2017-09-22T13:27:17.2505546Z
+                        Chroma:ET510LP Emission / Chroma:ET480/40x Excitation
+
+
+                        Cy3 or TRITC
+                        5.13087381616339
+                        2017-09-22T13:30:27.4364090Z
+                        Chroma:HQ572LP Emission / Chroma:HQ545/30x Excitation
+
+
+                        Texas Red or AF594
+                        0.204841067251092
+                        2017-09-22T14:38:30.8895713Z
+                        Semrock:FF01-657/106-25 Emission / Semrock:FF01-578/22-25 Excitation
+
+
+                        Cy5 or AF647
+                        0.00877244936874489
+                        2017-09-22T13:37:37.8905894Z
+                        Chroma:ET700/75m Emission / Chroma:ET620/60x Excitation
+
+                        ]
+                    </Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:19" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>ImageLength</Key>
+                    <Value>4200</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:20" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>SlideID</Key>
+                    <Value>[LuCa-7color_[17572,60173], LuCa-7color_[17572,60173], LuCa-7color_[17572,60173],
+                        LuCa-7color_[17572,60173], LuCa-7color_[17572,60173], LuCa-7color_[17572,60173],
+                        LuCa-7color_[17572,60173], LuCa-7color_[17572,60173]]
+                    </Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:21" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>ImageType</Key>
+                    <Value>[FullResolution, FullResolution, FullResolution, FullResolution, FullResolution,
+                        FullResolution, FullResolution, FullResolution]
+                    </Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:22" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>MetaDataPhotometricInterpretation</Key>
+                    <Value>Monochrome</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:23" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>DateTime</Key>
+                    <Value>2017:10:05 09:53:39</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:24" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>SMaxSampleValue</Key>
+                    <Value>66</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:25" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>IsUnmixedComponent</Key>
+                    <Value>[True, True, True, True, True, True, True, True]</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:26" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>ResolutionUnit</Key>
+                    <Value>Centimeter</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:27" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>Compression</Key>
+                    <Value>LZW</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:28" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>XPosition</Key>
+                    <Value>1.6176745893001603</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:29" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>TileLength</Key>
+                    <Value>512</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:30" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>PlanarConfiguration</Key>
+                    <Value>Chunky</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:31" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>Name</Key>
+                    <Value>[PDL1 (Opal 520), CD8 (Opal 540), FoxP3 (Opal 570), CD68 (Opal 620), PD1 (Opal 650), CK (Opal
+                        690), DAPI, Autofluorescence]
+                    </Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:32" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>TileByteCounts</Key>
+                    <Value>1201105</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:33" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>NumberOfChannels</Key>
+                    <Value>1</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:34" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>DescriptionVersion</Key>
+                    <Value>[2, 2, 2, 2, 2, 2, 2, 2]</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:35" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>ExposureTime</Key>
+                    <Value>[0, 0, 0, 0, 0, 0, 0, 0]</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:36" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>ValidationCode</Key>
+                    <Value>[A9133017671FDFFD0B50B48F68BD0B11CEC77797DCE33C25647EEE55A994125F,
+                        A9133017671FDFFD0B50B48F68BD0B11CEC77797DCE33C25647EEE55A994125F,
+                        A9133017671FDFFD0B50B48F68BD0B11CEC77797DCE33C25647EEE55A994125F,
+                        A9133017671FDFFD0B50B48F68BD0B11CEC77797DCE33C25647EEE55A994125F,
+                        A9133017671FDFFD0B50B48F68BD0B11CEC77797DCE33C25647EEE55A994125F,
+                        A9133017671FDFFD0B50B48F68BD0B11CEC77797DCE33C25647EEE55A994125F,
+                        A9133017671FDFFD0B50B48F68BD0B11CEC77797DCE33C25647EEE55A994125F,
+                        A9133017671FDFFD0B50B48F68BD0B11CEC77797DCE33C25647EEE55A994125F]
+                    </Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:37" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>SamplesPerPixel</Key>
+                    <Value>1</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:38" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>SignalUnits</Key>
+                    <Value>[33, 33, 33, 33, 33, 33, 33, 33]</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:39" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>ComputerName</Key>
+                    <Value>[HOPLL527, HOPLL527, HOPLL527, HOPLL527, HOPLL527, HOPLL527, HOPLL527, HOPLL527]</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:40" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>SMinSampleValue</Key>
+                    <Value>0</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:41" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>XResolution</Key>
+                    <Value>20080.543908699452</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:42" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>TileWidth</Key>
+                    <Value>512</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:43" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>TileOffsets</Key>
+                    <Value>25352185</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:44" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>YResolution</Key>
+                    <Value>20080.543908699452</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:45" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>BitsPerSample</Key>
+                    <Value>32</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:46" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>Software</Key>
+                    <Value>PerkinElmer-QPI</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:47" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>Identifier</Key>
+                    <Value>[0e486e0b-2511-4856-9852-c8be1915362d, 0e486e0b-2511-4856-9852-c8be1915362d,
+                        0e486e0b-2511-4856-9852-c8be1915362d, 0e486e0b-2511-4856-9852-c8be1915362d,
+                        0e486e0b-2511-4856-9852-c8be1915362d, 0e486e0b-2511-4856-9852-c8be1915362d,
+                        0e486e0b-2511-4856-9852-c8be1915362d, 0e486e0b-2511-4856-9852-c8be1915362d]
+                    </Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:48" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>Color</Key>
+                    <Value>[255,0,0, 255,255,0, 255,128,0, 255,0,255, 0,255,0, 0,255,255, 0,0,255, 0,0,0]</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:49" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>PhotometricInterpretation</Key>
+                    <Value>BlackIsZero</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:50" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>NewSubfileType</Key>
+                    <Value>0</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:51" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>Objective</Key>
+                    <Value>[10x [10x], 10x [10x], 10x [10x], 10x [10x], 10x [10x], 10x [10x], 10x [10x], 10x [10x]]
+                    </Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:52" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>ImageWidth</Key>
+                    <Value>5604</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:53" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>YPosition</Key>
+                    <Value>5.912702566000157</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:54" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>SampleFormat</Key>
+                    <Value>IEEE floating point</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:55" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>AcquisitionSoftware</Key>
+                    <Value>[Jenga, Jenga, Jenga, Jenga, Jenga, Jenga, Jenga, Jenga]</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:56" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>Responsivity</Key>
+                    <Value>[
+
+                        DAPI
+                        14.9368283928811
+                        2017-09-25T18:55:00.9465418Z
+                        Semrock:FF02-409/LP-25 Emission / Semrock:FF01-387/11-25 Excitation
+
+
+                        FITC or AF488
+                        152.7751358502
+                        2017-09-22T13:27:17.2505546Z
+                        Chroma:ET510LP Emission / Chroma:ET480/40x Excitation
+
+
+                        Cy3 or TRITC
+                        5.13087381616339
+                        2017-09-22T13:30:27.4364090Z
+                        Chroma:HQ572LP Emission / Chroma:HQ545/30x Excitation
+
+
+                        Texas Red or AF594
+                        0.204841067251092
+                        2017-09-22T14:38:30.8895713Z
+                        Semrock:FF01-657/106-25 Emission / Semrock:FF01-578/22-25 Excitation
+
+
+                        Cy5 or AF647
+                        0.00877244936874489
+                        2017-09-22T13:37:37.8905894Z
+                        Chroma:ET700/75m Emission / Chroma:ET620/60x Excitation
+
+                        ,
+
+                        DAPI
+                        14.9368283928811
+                        2017-09-25T18:55:00.9465418Z
+                        Semrock:FF02-409/LP-25 Emission / Semrock:FF01-387/11-25 Excitation
+
+
+                        FITC or AF488
+                        152.7751358502
+                        2017-09-22T13:27:17.2505546Z
+                        Chroma:ET510LP Emission / Chroma:ET480/40x Excitation
+
+
+                        Cy3 or TRITC
+                        5.13087381616339
+                        2017-09-22T13:30:27.4364090Z
+                        Chroma:HQ572LP Emission / Chroma:HQ545/30x Excitation
+
+
+                        Texas Red or AF594
+                        0.204841067251092
+                        2017-09-22T14:38:30.8895713Z
+                        Semrock:FF01-657/106-25 Emission / Semrock:FF01-578/22-25 Excitation
+
+
+                        Cy5 or AF647
+                        0.00877244936874489
+                        2017-09-22T13:37:37.8905894Z
+                        Chroma:ET700/75m Emission / Chroma:ET620/60x Excitation
+
+                        ,
+
+                        DAPI
+                        14.9368283928811
+                        2017-09-25T18:55:00.9465418Z
+                        Semrock:FF02-409/LP-25 Emission / Semrock:FF01-387/11-25 Excitation
+
+
+                        FITC or AF488
+                        152.7751358502
+                        2017-09-22T13:27:17.2505546Z
+                        Chroma:ET510LP Emission / Chroma:ET480/40x Excitation
+
+
+                        Cy3 or TRITC
+                        5.13087381616339
+                        2017-09-22T13:30:27.4364090Z
+                        Chroma:HQ572LP Emission / Chroma:HQ545/30x Excitation
+
+
+                        Texas Red or AF594
+                        0.204841067251092
+                        2017-09-22T14:38:30.8895713Z
+                        Semrock:FF01-657/106-25 Emission / Semrock:FF01-578/22-25 Excitation
+
+
+                        Cy5 or AF647
+                        0.00877244936874489
+                        2017-09-22T13:37:37.8905894Z
+                        Chroma:ET700/75m Emission / Chroma:ET620/60x Excitation
+
+                        ,
+
+                        DAPI
+                        14.9368283928811
+                        2017-09-25T18:55:00.9465418Z
+                        Semrock:FF02-409/LP-25 Emission / Semrock:FF01-387/11-25 Excitation
+
+
+                        FITC or AF488
+                        152.7751358502
+                        2017-09-22T13:27:17.2505546Z
+                        Chroma:ET510LP Emission / Chroma:ET480/40x Excitation
+
+
+                        Cy3 or TRITC
+                        5.13087381616339
+                        2017-09-22T13:30:27.4364090Z
+                        Chroma:HQ572LP Emission / Chroma:HQ545/30x Excitation
+
+
+                        Texas Red or AF594
+                        0.204841067251092
+                        2017-09-22T14:38:30.8895713Z
+                        Semrock:FF01-657/106-25 Emission / Semrock:FF01-578/22-25 Excitation
+
+
+                        Cy5 or AF647
+                        0.00877244936874489
+                        2017-09-22T13:37:37.8905894Z
+                        Chroma:ET700/75m Emission / Chroma:ET620/60x Excitation
+
+                        ,
+
+                        DAPI
+                        14.9368283928811
+                        2017-09-25T18:55:00.9465418Z
+                        Semrock:FF02-409/LP-25 Emission / Semrock:FF01-387/11-25 Excitation
+
+
+                        FITC or AF488
+                        152.7751358502
+                        2017-09-22T13:27:17.2505546Z
+                        Chroma:ET510LP Emission / Chroma:ET480/40x Excitation
+
+
+                        Cy3 or TRITC
+                        5.13087381616339
+                        2017-09-22T13:30:27.4364090Z
+                        Chroma:HQ572LP Emission / Chroma:HQ545/30x Excitation
+
+
+                        Texas Red or AF594
+                        0.204841067251092
+                        2017-09-22T14:38:30.8895713Z
+                        Semrock:FF01-657/106-25 Emission / Semrock:FF01-578/22-25 Excitation
+
+
+                        Cy5 or AF647
+                        0.00877244936874489
+                        2017-09-22T13:37:37.8905894Z
+                        Chroma:ET700/75m Emission / Chroma:ET620/60x Excitation
+
+                        ,
+
+                        DAPI
+                        14.9368283928811
+                        2017-09-25T18:55:00.9465418Z
+                        Semrock:FF02-409/LP-25 Emission / Semrock:FF01-387/11-25 Excitation
+
+
+                        FITC or AF488
+                        152.7751358502
+                        2017-09-22T13:27:17.2505546Z
+                        Chroma:ET510LP Emission / Chroma:ET480/40x Excitation
+
+
+                        Cy3 or TRITC
+                        5.13087381616339
+                        2017-09-22T13:30:27.4364090Z
+                        Chroma:HQ572LP Emission / Chroma:HQ545/30x Excitation
+
+
+                        Texas Red or AF594
+                        0.204841067251092
+                        2017-09-22T14:38:30.8895713Z
+                        Semrock:FF01-657/106-25 Emission / Semrock:FF01-578/22-25 Excitation
+
+
+                        Cy5 or AF647
+                        0.00877244936874489
+                        2017-09-22T13:37:37.8905894Z
+                        Chroma:ET700/75m Emission / Chroma:ET620/60x Excitation
+
+                        ,
+
+                        DAPI
+                        14.9368283928811
+                        2017-09-25T18:55:00.9465418Z
+                        Semrock:FF02-409/LP-25 Emission / Semrock:FF01-387/11-25 Excitation
+
+
+                        FITC or AF488
+                        152.7751358502
+                        2017-09-22T13:27:17.2505546Z
+                        Chroma:ET510LP Emission / Chroma:ET480/40x Excitation
+
+
+                        Cy3 or TRITC
+                        5.13087381616339
+                        2017-09-22T13:30:27.4364090Z
+                        Chroma:HQ572LP Emission / Chroma:HQ545/30x Excitation
+
+
+                        Texas Red or AF594
+                        0.204841067251092
+                        2017-09-22T14:38:30.8895713Z
+                        Semrock:FF01-657/106-25 Emission / Semrock:FF01-578/22-25 Excitation
+
+
+                        Cy5 or AF647
+                        0.00877244936874489
+                        2017-09-22T13:37:37.8905894Z
+                        Chroma:ET700/75m Emission / Chroma:ET620/60x Excitation
+
+                        ,
+
+                        DAPI
+                        14.9368283928811
+                        2017-09-25T18:55:00.9465418Z
+                        Semrock:FF02-409/LP-25 Emission / Semrock:FF01-387/11-25 Excitation
+
+
+                        FITC or AF488
+                        152.7751358502
+                        2017-09-22T13:27:17.2505546Z
+                        Chroma:ET510LP Emission / Chroma:ET480/40x Excitation
+
+
+                        Cy3 or TRITC
+                        5.13087381616339
+                        2017-09-22T13:30:27.4364090Z
+                        Chroma:HQ572LP Emission / Chroma:HQ545/30x Excitation
+
+
+                        Texas Red or AF594
+                        0.204841067251092
+                        2017-09-22T14:38:30.8895713Z
+                        Semrock:FF01-657/106-25 Emission / Semrock:FF01-578/22-25 Excitation
+
+
+                        Cy5 or AF647
+                        0.00877244936874489
+                        2017-09-22T13:37:37.8905894Z
+                        Chroma:ET700/75m Emission / Chroma:ET620/60x Excitation
+
+                        ]
+                    </Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:57" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>ImageLength</Key>
+                    <Value>4200</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:58" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>SlideID</Key>
+                    <Value>[LuCa-7color_[17572,60173], LuCa-7color_[17572,60173], LuCa-7color_[17572,60173],
+                        LuCa-7color_[17572,60173], LuCa-7color_[17572,60173], LuCa-7color_[17572,60173],
+                        LuCa-7color_[17572,60173], LuCa-7color_[17572,60173]]
+                    </Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:59" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>ImageType</Key>
+                    <Value>[FullResolution, FullResolution, FullResolution, FullResolution, FullResolution,
+                        FullResolution, FullResolution, FullResolution]
+                    </Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:60" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>MetaDataPhotometricInterpretation</Key>
+                    <Value>Monochrome</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:61" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>DateTime</Key>
+                    <Value>2017:10:05 09:53:39</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:62" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>SMaxSampleValue</Key>
+                    <Value>66</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:63" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>IsUnmixedComponent</Key>
+                    <Value>[True, True, True, True, True, True, True, True]</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:64" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>ResolutionUnit</Key>
+                    <Value>Centimeter</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:65" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>Compression</Key>
+                    <Value>LZW</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:66" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>XPosition</Key>
+                    <Value>1.6176745893001603</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:67" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>TileLength</Key>
+                    <Value>512</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:68" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>PlanarConfiguration</Key>
+                    <Value>Chunky</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:69" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>Name</Key>
+                    <Value>[PDL1 (Opal 520), CD8 (Opal 540), FoxP3 (Opal 570), CD68 (Opal 620), PD1 (Opal 650), CK (Opal
+                        690), DAPI, Autofluorescence]
+                    </Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:70" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>TileByteCounts</Key>
+                    <Value>1201105</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:71" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>NumberOfChannels</Key>
+                    <Value>1</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:72" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>DescriptionVersion</Key>
+                    <Value>[2, 2, 2, 2, 2, 2, 2, 2]</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:73" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>ExposureTime</Key>
+                    <Value>[0, 0, 0, 0, 0, 0, 0, 0]</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:74" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>ValidationCode</Key>
+                    <Value>[A9133017671FDFFD0B50B48F68BD0B11CEC77797DCE33C25647EEE55A994125F,
+                        A9133017671FDFFD0B50B48F68BD0B11CEC77797DCE33C25647EEE55A994125F,
+                        A9133017671FDFFD0B50B48F68BD0B11CEC77797DCE33C25647EEE55A994125F,
+                        A9133017671FDFFD0B50B48F68BD0B11CEC77797DCE33C25647EEE55A994125F,
+                        A9133017671FDFFD0B50B48F68BD0B11CEC77797DCE33C25647EEE55A994125F,
+                        A9133017671FDFFD0B50B48F68BD0B11CEC77797DCE33C25647EEE55A994125F,
+                        A9133017671FDFFD0B50B48F68BD0B11CEC77797DCE33C25647EEE55A994125F,
+                        A9133017671FDFFD0B50B48F68BD0B11CEC77797DCE33C25647EEE55A994125F]
+                    </Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <XMLAnnotation ID="Annotation:75" Namespace="openmicroscopy.org/OriginalMetadata">
+            <Value>
+                <OriginalMetadata>
+                    <Key>SamplesPerPixel</Key>
+                    <Value>1</Value>
+                </OriginalMetadata>
+            </Value>
+        </XMLAnnotation>
+        <MapAnnotation ID="Annotation:Resolution:0" Namespace="openmicroscopy.org/PyramidResolution">
+            <Value>
+                <M K="1">2802 2100</M>
+                <M K="2">1401 1050</M>
+                <M K="3">700 525</M>
+                <M K="4">350 262</M>
+                <M K="5">175 131</M>
+            </Value>
+        </MapAnnotation>
+    </StructuredAnnotations>
+</OME>

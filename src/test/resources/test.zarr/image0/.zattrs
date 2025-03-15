@@ -1,0 +1,165 @@
+{
+  "multiscales" : [ {
+    "metadata" : {
+      "method" : "loci.common.image.SimpleImageScaler",
+      "version" : "Bio-Formats 7.3.1"
+    },
+    "axes" : [ {
+      "name" : "t",
+      "type" : "time"
+    }, {
+      "name" : "c",
+      "type" : "channel"
+    }, {
+      "name" : "z",
+      "type" : "space"
+    }, {
+      "unit" : "micrometer",
+      "name" : "y",
+      "type" : "space"
+    }, {
+      "unit" : "micrometer",
+      "name" : "x",
+      "type" : "space"
+    } ],
+    "name" : "resolution #1",
+    "datasets" : [ {
+      "path" : "scale2",
+      "coordinateTransformations" : [ {
+        "scale" : [ 1.0, 1.0, 1.0, 0.9839558312632044, 0.9839558312632044 ],
+        "type" : "scale"
+      } ]
+    }, {
+      "path" : "scale3",
+      "coordinateTransformations" : [ {
+        "scale" : [ 1.0, 1.0, 1.0, 1.9839558312632044, 1.9839558312632044 ],
+        "type" : "scale"
+      } ]
+    }, {
+      "path" : "scale4",
+      "coordinateTransformations" : [ {
+        "scale" : [ 1.0, 1.0, 1.0, 3.967911662526409, 3.967911662526409 ],
+        "type" : "scale"
+      } ]
+    }, {
+      "path" : "scale5",
+      "coordinateTransformations" : [ {
+        "scale" : [ 1.0, 1.0, 1.0, 7.935823325052818, 7.935823325052818 ],
+        "type" : "scale"
+      } ]
+    } ],
+    "version" : "0.4"
+  } ],
+  "omero" : {
+    "channels" : [ {
+      "color" : "FF0000",
+      "coefficient" : 1,
+      "active" : true,
+      "label" : "PDL1 (Opal 520)",
+      "window" : {
+        "min" : 0.0,
+        "max" : 66.76290893554688,
+        "start" : 0.0,
+        "end" : 66.76290893554688
+      },
+      "family" : "linear",
+      "inverted" : false
+    }, {
+      "color" : "FFFF00",
+      "coefficient" : 1,
+      "active" : true,
+      "label" : "CD8 (Opal 540)",
+      "window" : {
+        "min" : 0.0,
+        "max" : 25.086063385009766,
+        "start" : 0.0,
+        "end" : 25.086063385009766
+      },
+      "family" : "linear",
+      "inverted" : false
+    }, {
+      "color" : "FF8000",
+      "coefficient" : 1,
+      "active" : true,
+      "label" : "FoxP3 (Opal 570)",
+      "window" : {
+        "min" : 0.0,
+        "max" : 15.784920692443848,
+        "start" : 0.0,
+        "end" : 15.784920692443848
+      },
+      "family" : "linear",
+      "inverted" : false
+    }, {
+      "color" : "FF00FF",
+      "coefficient" : 1,
+      "active" : false,
+      "label" : "CD68 (Opal 620)",
+      "window" : {
+        "min" : 0.0,
+        "max" : 9.020310401916504,
+        "start" : 0.0,
+        "end" : 9.020310401916504
+      },
+      "family" : "linear",
+      "inverted" : false
+    }, {
+      "color" : "00FF00",
+      "coefficient" : 1,
+      "active" : false,
+      "label" : "PD1 (Opal 650)",
+      "window" : {
+        "min" : 0.0,
+        "max" : 77.82771301269531,
+        "start" : 0.0,
+        "end" : 77.82771301269531
+      },
+      "family" : "linear",
+      "inverted" : false
+    }, {
+      "color" : "00FFFF",
+      "coefficient" : 1,
+      "active" : false,
+      "label" : "CK (Opal 690)",
+      "window" : {
+        "min" : 0.0,
+        "max" : 46.21053695678711,
+        "start" : 0.0,
+        "end" : 46.21053695678711
+      },
+      "family" : "linear",
+      "inverted" : false
+    }, {
+      "color" : "0000FF",
+      "coefficient" : 1,
+      "active" : false,
+      "label" : "DAPI",
+      "window" : {
+        "min" : 0.0,
+        "max" : 39.83445358276367,
+        "start" : 0.0,
+        "end" : 39.83445358276367
+      },
+      "family" : "linear",
+      "inverted" : false
+    }, {
+      "color" : "000000",
+      "coefficient" : 1,
+      "active" : false,
+      "label" : "Autofluorescence",
+      "window" : {
+        "min" : 0.0,
+        "max" : 23.98431968688965,
+        "start" : 0.0,
+        "end" : 23.98431968688965
+      },
+      "family" : "linear",
+      "inverted" : false
+    } ],
+    "rdefs" : {
+      "defaultT" : 0,
+      "model" : "greyscale",
+      "defaultZ" : 0
+    }
+  }
+}
