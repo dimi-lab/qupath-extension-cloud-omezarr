@@ -25,7 +25,16 @@ class CloudOmeZarrServerTest {
     assertEquals(8, server.getDownsampleForResolution(3).roundToInt())
 
     assertEquals(8, server.nChannels())
-    val names = listOf("PDL1 (Opal 520)", "CD8 (Opal 540)", "FoxP3 (Opal 570)", "CD68 (Opal 620)", "PD1 (Opal 650)", "CK (Opal 690)", "DAPI", "Autofluorescence")
+    val names = listOf(
+      "PDL1 (Opal 520)",
+      "CD8 (Opal 540)",
+      "FoxP3 (Opal 570)",
+      "CD68 (Opal 620)",
+      "PD1 (Opal 650)",
+      "CK (Opal 690)",
+      "DAPI",
+      "Autofluorescence"
+    )
     assertEquals(names, (0 until server.nChannels()).map { server.getChannel(it).name })
 
     assertEquals(PixelType.FLOAT32, server.pixelType)
