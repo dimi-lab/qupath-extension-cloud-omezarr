@@ -1,10 +1,14 @@
 package dimilab.qupath.ext.cloud_omezarr
 
 import com.bc.zarr.ZarrArray
+import dimilab.qupath.ext.cloud_omezarr.OmeZarrUtils.Companion.logger
 import org.slf4j.Logger
-import qupath.lib.color.ColorModelFactory
 import qupath.lib.images.servers.PixelType
 import java.awt.image.*
+import java.net.URI
+import java.nio.file.FileSystems
+import java.nio.file.Path
+import java.nio.file.ProviderNotFoundException
 import ome.xml.model.enums.PixelType as OmePixelType
 
 class OmeZarrUtils {
@@ -105,4 +109,22 @@ fun renderZarrToBufferedImage(
   }
 
   return BufferedImage(colorModel, raster, false, null)
+}
+
+fun getZarrRoot(uri: URI): Path {
+  val zarrFs = try {
+    FileSystems.getFileSystem(uri.resolve("/"))
+  } catch (e: ProviderNotFoundException) {
+    logger.error("No file system provider found for scheme {}, uri {}", uri.scheme, uri, e)
+    throw IllegalArgumentException("Unsupported scheme '${uri.scheme}'")
+  }
+
+  // As a convenience, if the URI ends with .zattrs, we use the parent directory as the root.
+  // In some applications it's hard to select a directory, so this lets the user select the file instead.
+  if (uri.path.endsWith("/.zattrs")) {
+    logger.info("Zarr root is .zattrs, using directory instead")
+    return zarrFs.getPath(uri.resolve("./").path)
+  }
+
+  return zarrFs.getPath(uri.path)
 }

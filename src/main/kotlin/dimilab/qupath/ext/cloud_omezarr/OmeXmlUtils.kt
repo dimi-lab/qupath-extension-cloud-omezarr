@@ -12,11 +12,10 @@ import org.xml.sax.SAXException
 import qupath.lib.common.ColorTools
 import qupath.lib.images.servers.ImageChannel
 import java.io.IOException
-import java.net.URI
+import java.nio.file.Path
 import javax.xml.parsers.ParserConfigurationException
 import javax.xml.transform.TransformerException
 import kotlin.io.path.absolutePathString
-import kotlin.io.path.toPath
 
 
 class OmeXmlUtils {
@@ -25,9 +24,7 @@ class OmeXmlUtils {
   }
 }
 
-fun parseOmeXmlMetadata(omeRoot: URI): OMEXMLMetadata {
-  assert(omeRoot.path.endsWith("/"))
-
+fun parseOmeXmlMetadata(omeRoot: Path): OMEXMLMetadata {
   val xml = readOmeXml(omeRoot.resolve("METADATA.ome.xml"))
 
   val service = ServiceFactory().getInstance(OMEXMLService::class.java)
@@ -35,11 +32,9 @@ fun parseOmeXmlMetadata(omeRoot: URI): OMEXMLMetadata {
 }
 
 
-fun readOmeXml(uri: URI): String {
-  val metadataFilePath = uri.toPath()
-
+fun readOmeXml(metadataFile: Path): String {
   val omeDocument = try {
-    val measurement = RandomAccessInputStream(metadataFilePath.absolutePathString())
+    val measurement = RandomAccessInputStream(metadataFile.absolutePathString())
     XMLTools.parseDOM(measurement)
   } catch (e: ParserConfigurationException) {
     throw IOException(e)
