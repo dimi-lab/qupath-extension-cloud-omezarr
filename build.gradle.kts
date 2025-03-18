@@ -29,7 +29,7 @@ tasks.named("build") {
 }
 
 kotlin {
-  jvmToolchain(17)
+  jvmToolchain(21)
 }
 
 dependencies {
@@ -55,6 +55,7 @@ dependencies {
   // For testing
   testImplementation(libs.bundles.qupath)
   testImplementation(kotlin("test"))
+  testImplementation("io.mockk:mockk:1.13.17")
 }
 
 repositories {

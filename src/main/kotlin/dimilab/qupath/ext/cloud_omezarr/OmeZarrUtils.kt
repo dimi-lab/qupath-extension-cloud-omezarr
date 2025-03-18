@@ -115,7 +115,7 @@ fun getZarrRoot(uri: URI): Path {
   val zarrFs = try {
     FileSystems.getFileSystem(uri.resolve("/"))
   } catch (e: ProviderNotFoundException) {
-    logger.error("No file system provider found for scheme {}, uri {}", uri.scheme, uri, e)
+    logger.error("No java.nio FileSystemProvider found for scheme '{}', uri: {}", uri.scheme, uri, e)
     throw IllegalArgumentException("Unsupported scheme '${uri.scheme}'")
   }
 

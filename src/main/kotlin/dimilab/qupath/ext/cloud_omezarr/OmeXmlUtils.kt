@@ -1,7 +1,6 @@
 package dimilab.qupath.ext.cloud_omezarr
 
 import dimilab.qupath.ext.cloud_omezarr.OmeXmlUtils.Companion.logger
-import loci.common.RandomAccessInputStream
 import loci.common.services.ServiceFactory
 import loci.common.xml.XMLTools
 import loci.formats.ome.OMEXMLMetadata
@@ -11,11 +10,12 @@ import org.slf4j.Logger
 import org.xml.sax.SAXException
 import qupath.lib.common.ColorTools
 import qupath.lib.images.servers.ImageChannel
+import java.io.ByteArrayInputStream
 import java.io.IOException
 import java.nio.file.Path
 import javax.xml.parsers.ParserConfigurationException
 import javax.xml.transform.TransformerException
-import kotlin.io.path.absolutePathString
+import kotlin.io.path.readBytes
 
 
 class OmeXmlUtils {
@@ -34,8 +34,8 @@ fun parseOmeXmlMetadata(omeRoot: Path): OMEXMLMetadata {
 
 fun readOmeXml(metadataFile: Path): String {
   val omeDocument = try {
-    val measurement = RandomAccessInputStream(metadataFile.absolutePathString())
-    XMLTools.parseDOM(measurement)
+    val stream = ByteArrayInputStream(metadataFile.readBytes())
+    XMLTools.parseDOM(stream)
   } catch (e: ParserConfigurationException) {
     throw IOException(e)
   } catch (e: SAXException) {
