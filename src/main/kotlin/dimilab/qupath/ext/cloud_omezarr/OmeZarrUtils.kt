@@ -1,11 +1,13 @@
 package dimilab.qupath.ext.cloud_omezarr
 
 import com.bc.zarr.ZarrArray
+import com.google.cloud.storage.contrib.nio.CloudStorageFileSystemProvider
 import dimilab.qupath.ext.cloud_omezarr.OmeZarrUtils.Companion.logger
 import org.slf4j.Logger
 import qupath.lib.images.servers.PixelType
 import java.awt.image.*
 import java.net.URI
+import java.nio.file.FileSystem
 import java.nio.file.FileSystems
 import java.nio.file.Path
 import java.nio.file.ProviderNotFoundException
@@ -111,9 +113,21 @@ fun renderZarrToBufferedImage(
   return BufferedImage(colorModel, raster, false, null)
 }
 
+fun uriToFileSystem(rootUri: URI): FileSystem {
+  return when (rootUri.scheme) {
+    "gs" -> {
+      CloudStorageFileSystemProvider().getFileSystem(rootUri)
+    }
+
+    else -> {
+      FileSystems.getFileSystem(rootUri)
+    }
+  }
+}
+
 fun getZarrRoot(uri: URI): Path {
   val zarrFs = try {
-    FileSystems.getFileSystem(uri.resolve("/"))
+    uriToFileSystem(uri.resolve("/"))
   } catch (e: ProviderNotFoundException) {
     logger.error("No java.nio FileSystemProvider found for scheme '{}', uri: {}", uri.scheme, uri, e)
     throw IllegalArgumentException("Unsupported scheme '${uri.scheme}'")
