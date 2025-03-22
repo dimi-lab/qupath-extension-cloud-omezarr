@@ -25,8 +25,11 @@ class OmeXmlUtils {
 }
 
 fun parseOmeXmlMetadata(omeRoot: Path): OMEXMLMetadata {
-  val xml = readOmeXml(omeRoot.resolve("METADATA.ome.xml"))
+  val xmlPath = omeRoot.resolve("METADATA.ome.xml")
+  logger.debug("Reading OME XML metadata from {}", xmlPath)
+  val xml = readOmeXml(xmlPath)
 
+  logger.debug("Parsing OME XML metadata")
   val service = ServiceFactory().getInstance(OMEXMLService::class.java)
   return service.createOMEXMLMetadata(xml)
 }
