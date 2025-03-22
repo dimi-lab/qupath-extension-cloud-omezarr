@@ -1,4 +1,4 @@
-package dimilab.qupath.ext.cloud_omezarr
+package dimilab.qupath.ext.omezarr
 
 import com.bc.zarr.ZarrArray
 import com.bc.zarr.ZarrGroup

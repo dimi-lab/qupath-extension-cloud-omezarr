@@ -1,6 +1,6 @@
-package dimilab.qupath.ext.cloud_omezarr
+package dimilab.qupath.ext.omezarr
 
-import dimilab.qupath.ext.cloud_omezarr.OmeXmlUtils.Companion.logger
+import dimilab.qupath.ext.omezarr.OmeXmlUtils.Companion.logger
 import loci.common.services.ServiceFactory
 import loci.common.xml.XMLTools
 import loci.formats.ome.OMEXMLMetadata

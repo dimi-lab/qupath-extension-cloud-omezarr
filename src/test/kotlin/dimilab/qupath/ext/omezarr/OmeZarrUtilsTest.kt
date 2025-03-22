@@ -1,4 +1,4 @@
-package dimilab.qupath.ext.cloud_omezarr
+package dimilab.qupath.ext.omezarr
 
 import com.google.cloud.storage.contrib.nio.CloudStorageFileSystem
 import java.net.URI

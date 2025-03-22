@@ -1,4 +1,4 @@
-package dimilab.qupath.ext.cloud_omezarr
+package dimilab.qupath.ext.omezarr
 
 import com.google.cloud.storage.BlobId
 import com.google.cloud.storage.BlobInfo
