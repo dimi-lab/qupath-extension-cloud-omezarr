@@ -1,8 +1,8 @@
-package dimilab.qupath.ext.cloud_omezarr
+package dimilab.qupath.ext.omezarr
 
 import com.bc.zarr.ZarrArray
 import com.google.cloud.storage.contrib.nio.CloudStorageFileSystemProvider
-import dimilab.qupath.ext.cloud_omezarr.OmeZarrUtils.Companion.logger
+import dimilab.qupath.ext.omezarr.OmeZarrUtils.Companion.logger
 import org.slf4j.Logger
 import qupath.lib.images.servers.PixelType
 import java.awt.image.*

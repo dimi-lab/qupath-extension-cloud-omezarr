@@ -1,6 +1,6 @@
-package dimilab.qupath.ext.cloud_omezarr
+package dimilab.qupath.ext.omezarr
 
-import dimilab.qupath.ext.cloud_omezarr.ui.InterfaceController
+import dimilab.qupath.ext.omezarr.ui.InterfaceController
 import javafx.beans.property.BooleanProperty
 import javafx.beans.property.Property
 import javafx.event.ActionEvent
@@ -26,7 +26,7 @@ class CloudOmeZarrExtension : QuPathExtension, GitHubProject {
   companion object {
     val logger: Logger = LoggerFactory.getLogger(CloudOmeZarrExtension::class.java)
 
-    val resources: ResourceBundle = ResourceBundle.getBundle("dimilab.qupath.ext.cloud_omezarr.ui.strings")
+    val resources: ResourceBundle = ResourceBundle.getBundle("dimilab.qupath.ext.omezarr.ui.strings")
     // Display name
     val EXTENSION_NAME: String = resources.getString("name")
     // Short description

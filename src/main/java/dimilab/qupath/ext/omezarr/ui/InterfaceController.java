@@ -1,10 +1,10 @@
-package dimilab.qupath.ext.cloud_omezarr.ui;
+package dimilab.qupath.ext.omezarr.ui;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Spinner;
 import javafx.scene.layout.VBox;
-import dimilab.qupath.ext.cloud_omezarr.CloudOmeZarrExtension;
+import dimilab.qupath.ext.omezarr.CloudOmeZarrExtension;
 import qupath.fx.dialogs.Dialogs;
 
 import java.io.IOException;

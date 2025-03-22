@@ -1,4 +1,4 @@
-package dimilab.qupath.ext.cloud_omezarr
+package dimilab.qupath.ext.omezarr
 
 import qupath.lib.images.servers.ImageServer
 import qupath.lib.images.servers.ImageServerBuilder
