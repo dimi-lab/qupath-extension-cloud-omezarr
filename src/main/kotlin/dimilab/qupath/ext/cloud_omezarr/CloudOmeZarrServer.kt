@@ -14,13 +14,15 @@ import java.awt.image.BufferedImage
 import java.awt.image.ColorModel
 import java.io.IOException
 import java.net.URI
-import kotlin.io.path.toPath
+import java.nio.file.Path
 
 
 class CloudOmeZarrServer(private val zarrBaseUri: URI, vararg args: String) : AbstractTileableImageServer() {
   companion object {
     private val logger = org.slf4j.LoggerFactory.getLogger(CloudOmeZarrServer::class.java)
   }
+
+  private val zarrRoot: Path
 
   data class OmeZarrMetadata(
     val imageName: String,
@@ -47,30 +49,38 @@ class CloudOmeZarrServer(private val zarrBaseUri: URI, vararg args: String) : Ab
   private val colorModel: ColorModel
 
   init {
-    logger.info("Creating CloudOmeZarrServer from $zarrBaseUri with args ${args.joinToString(" ")}")
+    logger.info("Creating CloudOmeZarrServer from $zarrBaseUri with args: ${args.joinToString(" ")}")
 
-    // Open the Zarray at the root
-    val rootZarr = ZarrGroup.open(zarrBaseUri.toPath())
+    zarrRoot = getZarrRoot(zarrBaseUri)
+    logger.info("Loading base array at $zarrRoot")
+    val rootZarr = ZarrGroup.open(zarrRoot)
     if (rootZarr.attributes["bioformats2raw.layout"] != 3) {
       throw IOException("Expected a Zarr array with layout 3, but found ${rootZarr.attributes["bioformats2raw.layout"]}")
     }
 
+    logger.info("Reading OME-Zarr shape & metadata")
+
     val omeZarrMetadata = readOmeZarrMetadata(rootZarr)
+    val omeMetadata = omeZarrMetadata.omeXml
 
     val imageZarr = rootZarr.openSubGroup(omeZarrMetadata.imageName)
+
+    logger.info("Reading scale levels from ${omeZarrMetadata.imageName}")
     scaleLevels = buildScaleLevels(imageZarr)
 
-    val omeMetadata = omeZarrMetadata.omeXml
+    logger.info("Getting pixel & channel information from OME metadata")
     val channels = omeChannelsToQuPath(omeMetadata)
 
     val omePixelType = omeMetadata.getPixelsType(0)
     checkPixelType(omePixelType, omeMetadata.getPixelsBigEndian(0), scaleLevels)
     val pixelType = omeXmlPixelTypeToQupath(omePixelType)
     colorModel = ColorModelFactory.createColorModel(pixelType, channels)
+    logger.info("Pixel type: $pixelType; channels: ${channels.size}")
 
     val levelsBuilder = ImageResolutionLevel.Builder(scaleLevels[0].width, scaleLevels[0].height)
     scaleLevels.forEach { levelsBuilder.addLevel(it.width, it.height) }
 
+    logger.info("Creating QuPath metadata")
     metadata =
       ImageServerMetadata.Builder()
         .width(scaleLevels[0].width)
@@ -81,6 +91,11 @@ class CloudOmeZarrServer(private val zarrBaseUri: URI, vararg args: String) : Ab
         .preferredTileSize(scaleLevels[0].tileWidth, scaleLevels[0].tileHeight).build()
   }
 
+  override fun close() {
+    zarrRoot.fileSystem.close()
+    super.close()
+  }
+
   private fun readOmeZarrMetadata(omezarr: ZarrGroup): OmeZarrMetadata {
     val metadataZarr = omezarr.openSubGroup("OME")
     val imageNames = metadataZarr.attributes["series"] as List<*>
@@ -88,8 +103,7 @@ class CloudOmeZarrServer(private val zarrBaseUri: URI, vararg args: String) : Ab
       throw IOException("Expected a single image in OME-Zarr, but found: $imageNames")
     }
 
-    val omeBaseUri = zarrBaseUri.resolve("OME/")
-    val omeMetadata = parseOmeXmlMetadata(omeBaseUri)
+    val omeMetadata = parseOmeXmlMetadata(zarrRoot.resolve("OME"))
 
     if (omeMetadata.imageCount != 1) {
       throw IOException("Expected a single image in OME-Zarr, but found ${omeMetadata.imageCount}")
@@ -186,5 +200,15 @@ class CloudOmeZarrServer(private val zarrBaseUri: URI, vararg args: String) : Ab
       metadata.pixelType,
       metadata.channels.size
     )
+  }
+
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other !is CloudOmeZarrServer) return false
+
+    if (zarrBaseUri != other.zarrBaseUri) return false
+    if (!serverArgs.contentEquals(other.serverArgs)) return false
+
+    return true
   }
 }

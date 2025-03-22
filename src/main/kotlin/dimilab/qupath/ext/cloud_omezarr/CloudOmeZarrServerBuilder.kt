@@ -14,16 +14,25 @@ class CloudOmeZarrServerBuilder : ImageServerBuilder<BufferedImage> {
   }
 
   override fun checkImageSupport(uri: URI?, vararg args: String?): UriImageSupport<BufferedImage>? {
-    logger.info("Checking image support for CloudOmeZarrServerBuilder: $uri")
+    logger.info("Checking image support for CloudOmeZarrServerBuilder: $uri (scheme: ${uri?.scheme}, path: ${uri?.path})")
     if (uri == null) {
       return null
     }
-    if (!supportedSchema(uri)) {
+
+    val effectiveUri = if (uri.scheme == "file" && uri.path.startsWith("/gs:/")) {
+      val new = URI.create("gs://${uri.path.substringAfter("/gs:/")}")
+      logger.info("Converted file URI to GCS: $new; scheme: ${new.scheme}, path: ${new.path}")
+      new
+    } else {
+      uri
+    }
+
+    if (!supportedSchema(effectiveUri)) {
       return null
     }
 
     // TODO: look for an omezarr structure at the URI
-    if (!uri.path.endsWith(".zattrs") && !uri.path.endsWith(".zarr/")) {
+    if (!effectiveUri.path.endsWith(".zattrs") && !effectiveUri.path.endsWith(".zarr") && !effectiveUri.path.endsWith(".zarr/")) {
       return null
     }
 
@@ -55,15 +64,15 @@ class CloudOmeZarrServerBuilder : ImageServerBuilder<BufferedImage> {
         DefaultImageServerBuilder.createInstance(
           this.javaClass,
           metadata,
-          uri,
+          effectiveUri,
           *args
         )
       )
     )
   }
 
-  private fun supportedSchema(uri: URI?): Boolean {
-    return uri?.scheme == "gs" || uri?.scheme == "file"
+  private fun supportedSchema(uri: URI): Boolean {
+    return uri.scheme == "gs" || uri.scheme == "file"
   }
 
   override fun buildServer(uri: URI?, vararg args: String): ImageServer<BufferedImage>? {

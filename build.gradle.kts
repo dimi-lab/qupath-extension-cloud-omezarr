@@ -29,7 +29,7 @@ tasks.named("build") {
 }
 
 kotlin {
-  jvmToolchain(17)
+  jvmToolchain(21)
 }
 
 dependencies {
@@ -48,9 +48,14 @@ dependencies {
   implementation("org.openmicroscopy:ome-model:6.4.0")
   implementation("dev.zarr:jzarr:0.4.2")
 
+  // Google Cloud Storage NIO filesystem
+  implementation(platform("com.google.cloud:libraries-bom:23.0.0"))
+  implementation("com.google.cloud:google-cloud-nio")
+
   // For testing
   testImplementation(libs.bundles.qupath)
   testImplementation(kotlin("test"))
+  testImplementation("io.mockk:mockk:1.13.17")
 }
 
 repositories {

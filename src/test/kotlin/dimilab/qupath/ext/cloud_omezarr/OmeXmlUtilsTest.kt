@@ -1,5 +1,6 @@
 package dimilab.qupath.ext.cloud_omezarr
 
+import kotlin.io.path.toPath
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -9,8 +10,8 @@ class OmeXmlUtilsTest {
 
   @Test
   fun testOmeChannelsToQuPath() {
-    val omeBaseUri = testZarrRootUri.resolve("OME/")
-    val omeZarrMetadata = parseOmeXmlMetadata(omeBaseUri)
+    val omeBase = testZarrRootUri.resolve("OME/").toPath()
+    val omeZarrMetadata = parseOmeXmlMetadata(omeBase)
     val channels = omeChannelsToQuPath(omeZarrMetadata)
 
     assert(channels.size == 8)

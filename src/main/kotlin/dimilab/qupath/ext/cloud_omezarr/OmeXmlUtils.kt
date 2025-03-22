@@ -1,7 +1,6 @@
 package dimilab.qupath.ext.cloud_omezarr
 
 import dimilab.qupath.ext.cloud_omezarr.OmeXmlUtils.Companion.logger
-import loci.common.RandomAccessInputStream
 import loci.common.services.ServiceFactory
 import loci.common.xml.XMLTools
 import loci.formats.ome.OMEXMLMetadata
@@ -11,12 +10,12 @@ import org.slf4j.Logger
 import org.xml.sax.SAXException
 import qupath.lib.common.ColorTools
 import qupath.lib.images.servers.ImageChannel
+import java.io.ByteArrayInputStream
 import java.io.IOException
-import java.net.URI
+import java.nio.file.Path
 import javax.xml.parsers.ParserConfigurationException
 import javax.xml.transform.TransformerException
-import kotlin.io.path.absolutePathString
-import kotlin.io.path.toPath
+import kotlin.io.path.readBytes
 
 
 class OmeXmlUtils {
@@ -25,22 +24,21 @@ class OmeXmlUtils {
   }
 }
 
-fun parseOmeXmlMetadata(omeRoot: URI): OMEXMLMetadata {
-  assert(omeRoot.path.endsWith("/"))
+fun parseOmeXmlMetadata(omeRoot: Path): OMEXMLMetadata {
+  val xmlPath = omeRoot.resolve("METADATA.ome.xml")
+  logger.debug("Reading OME XML metadata from {}", xmlPath)
+  val xml = readOmeXml(xmlPath)
 
-  val xml = readOmeXml(omeRoot.resolve("METADATA.ome.xml"))
-
+  logger.debug("Parsing OME XML metadata")
   val service = ServiceFactory().getInstance(OMEXMLService::class.java)
   return service.createOMEXMLMetadata(xml)
 }
 
 
-fun readOmeXml(uri: URI): String {
-  val metadataFilePath = uri.toPath()
-
+fun readOmeXml(metadataFile: Path): String {
   val omeDocument = try {
-    val measurement = RandomAccessInputStream(metadataFilePath.absolutePathString())
-    XMLTools.parseDOM(measurement)
+    val stream = ByteArrayInputStream(metadataFile.readBytes())
+    XMLTools.parseDOM(stream)
   } catch (e: ParserConfigurationException) {
     throw IOException(e)
   } catch (e: SAXException) {
