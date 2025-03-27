@@ -62,6 +62,12 @@ repositories {
   mavenCentral()
 }
 
+tasks.withType<Exec> {
+  doFirst {
+    environment("JAVA_OPTS", "-Djna.library.path=${System.getenv("CBLOSC_LIB")}")
+  }
+}
+
 tasks.test {
   useJUnitPlatform()
 }
