@@ -62,12 +62,20 @@ repositories {
   mavenCentral()
 }
 
+tasks.withType<Test> {
+  doFirst {
+    environment("JAVA_OPTS", "-Djna.library.path=${System.getenv("CBLOSC_LIB")}")
+    // Need to do something different for non-Mac builds
+    environment("DYLD_LIBRARY_PATH", System.getenv("CBLOSC_LIB"))
+  }
+
+  useJUnitPlatform()
+}
+
 tasks.withType<Exec> {
   doFirst {
     environment("JAVA_OPTS", "-Djna.library.path=${System.getenv("CBLOSC_LIB")}")
+    // Need to do something different for non-Mac builds
+    environment("DYLD_LIBRARY_PATH", System.getenv("CBLOSC_LIB"))
   }
-}
-
-tasks.test {
-  useJUnitPlatform()
 }
