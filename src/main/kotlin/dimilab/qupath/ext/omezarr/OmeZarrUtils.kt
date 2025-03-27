@@ -3,6 +3,7 @@ package dimilab.qupath.ext.omezarr
 import com.bc.zarr.ZarrArray
 import com.google.cloud.storage.contrib.nio.CloudStorageFileSystemProvider
 import dimilab.qupath.ext.omezarr.OmeZarrUtils.Companion.logger
+import kotlinx.coroutines.*
 import org.slf4j.Logger
 import qupath.lib.images.servers.PixelType
 import java.awt.image.*
@@ -71,6 +72,51 @@ private fun makeBuffer(width: Int, height: Int, numChannels: Int, pixelType: Pix
   }
 }
 
+fun CoroutineScope.launchChannelReader(
+  zarrArray: ZarrArray,
+  raster: WritableRaster,
+  readShape: IntArray,
+  c: Int,
+  x: Int,
+  y: Int,
+  width: Int,
+  height: Int,
+) = async {
+  val readOffset = intArrayOf(0, c, 0, y, x)
+  logger.trace("Reading shape {} at offset {}", readShape, readOffset)
+  val readData = zarrArray.read(readShape, readOffset)
+
+  when (readData) {
+    is DoubleArray -> {
+      raster.setSamples(0, 0, width, height, c, readData)
+    }
+
+    is FloatArray -> {
+      raster.setSamples(0, 0, width, height, c, readData)
+    }
+
+    is ByteArray -> {
+      raster.setSamples(0, 0, width, height, c, readData.map { it.toInt() }.toIntArray())
+    }
+
+    is ShortArray -> {
+      raster.setSamples(0, 0, width, height, c, readData.map { it.toInt() }.toIntArray())
+    }
+
+    is IntArray -> {
+      raster.setSamples(0, 0, width, height, c, readData)
+    }
+
+    is LongArray -> {
+      raster.setSamples(0, 0, width, height, c, readData.map { it.toInt() }.toIntArray())
+    }
+
+    else -> {
+      throw IllegalArgumentException("Unsupported data type: ${readData::class.java}")
+    }
+  }
+}
+
 fun renderZarrToBufferedImage(
   zarrArray: ZarrArray,
   colorModel: ColorModel,
@@ -87,40 +133,12 @@ fun renderZarrToBufferedImage(
 
   val readShape = intArrayOf(1, 1, 1, height, width)
 
-  (0 until numChannels).forEach { c ->
-    val readOffset = intArrayOf(0, c, 0, y, x)
-    logger.trace("Reading shape {} at offset {}", readShape, readOffset)
-    val readData = zarrArray.read(readShape, readOffset)
-
-    when (readData) {
-      is DoubleArray -> {
-        raster.setSamples(0, 0, width, height, c, readData)
-      }
-
-      is FloatArray -> {
-        raster.setSamples(0, 0, width, height, c, readData)
-      }
-
-      is ByteArray -> {
-        raster.setSamples(0, 0, width, height, c, readData.map { it.toInt() }.toIntArray())
-      }
-
-      is ShortArray -> {
-        raster.setSamples(0, 0, width, height, c, readData.map { it.toInt() }.toIntArray())
-      }
-
-      is IntArray -> {
-        raster.setSamples(0, 0, width, height, c, readData)
-      }
-
-      is LongArray -> {
-        raster.setSamples(0, 0, width, height, c, readData.map { it.toInt() }.toIntArray())
-      }
-
-      else -> {
-        throw IllegalArgumentException("Unsupported data type: ${readData::class.java}")
-      }
+  runBlocking(Dispatchers.IO) {
+    val workers = (0 until numChannels).map { c ->
+      launchChannelReader(zarrArray, raster, readShape, c, x, y, width, height)
     }
+
+    workers.awaitAll()
   }
 
   return BufferedImage(colorModel, raster, false, null)
