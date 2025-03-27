@@ -7,6 +7,7 @@ import org.slf4j.Logger
 import qupath.lib.images.servers.PixelType
 import java.awt.image.*
 import java.net.URI
+import java.nio.ByteOrder
 import java.nio.file.FileSystem
 import java.nio.file.FileSystems
 import java.nio.file.Path
@@ -48,7 +49,7 @@ fun checkPixelType(
       )
     }
 
-    val zarrBigEndian = scaleLevel.zarrArray.byteOrder == java.nio.ByteOrder.BIG_ENDIAN
+    val zarrBigEndian = scaleLevel.zarrArray.byteOrder == ByteOrder.BIG_ENDIAN
     if (omeBigEndian != zarrBigEndian) {
       throw IllegalArgumentException(
         "Zarr bigendian=${scaleLevel.zarrArray.byteOrder} does not match OME XML bigendian=$omeBigEndian for scale level ${scaleLevel.path}"
@@ -67,7 +68,6 @@ private fun makeBuffer(width: Int, height: Int, numChannels: Int, pixelType: Pix
     PixelType.INT32 -> DataBufferInt(width * height, numChannels)
     PixelType.FLOAT32 -> DataBufferFloat(width * height, numChannels)
     PixelType.FLOAT64 -> DataBufferDouble(width * height, numChannels)
-    else -> throw IllegalArgumentException("Unsupported pixel type: $pixelType")
   }
 }
 
@@ -89,6 +89,7 @@ fun renderZarrToBufferedImage(
 
   (0 until numChannels).forEach { c ->
     val readOffset = intArrayOf(0, c, 0, y, x)
+    logger.trace("Reading shape {} at offset {}", readShape, readOffset)
     val readData = zarrArray.read(readShape, readOffset)
 
     when (readData) {
@@ -100,8 +101,20 @@ fun renderZarrToBufferedImage(
         raster.setSamples(0, 0, width, height, c, readData)
       }
 
-      is ByteArray, is ShortArray, is IntArray, is LongArray -> {
-        raster.setSamples(0, 0, width, height, c, readData as IntArray)
+      is ByteArray -> {
+        raster.setSamples(0, 0, width, height, c, readData.map { it.toInt() }.toIntArray())
+      }
+
+      is ShortArray -> {
+        raster.setSamples(0, 0, width, height, c, readData.map { it.toInt() }.toIntArray())
+      }
+
+      is IntArray -> {
+        raster.setSamples(0, 0, width, height, c, readData)
+      }
+
+      is LongArray -> {
+        raster.setSamples(0, 0, width, height, c, readData.map { it.toInt() }.toIntArray())
       }
 
       else -> {
