@@ -1,3 +1,9 @@
+# Ignore .idea ide files
+# Maybe we should include these for IDEA users…
+.idea
+
+# Other entries:
+
 .DS_Store
 .idea/shelf
 /confluence/target
