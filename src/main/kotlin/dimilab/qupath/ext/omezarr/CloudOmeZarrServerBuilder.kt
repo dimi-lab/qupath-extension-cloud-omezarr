@@ -19,8 +19,8 @@ class CloudOmeZarrServerBuilder : ImageServerBuilder<BufferedImage> {
       return null
     }
 
-    val effectiveUri = if (uri.scheme == "file" && uri.path.startsWith("/gs:/")) {
-      val new = URI.create("gs://${uri.path.substringAfter("/gs:/")}")
+    val effectiveUri = if (uri.scheme == "file" && uri.path.contains("/gs:/")) {
+      val new = URI.create("gs://${uri.path.substringAfter("gs:/")}")
       logger.info("Converted file URI to GCS: $new; scheme: ${new.scheme}, path: ${new.path}")
       new
     } else {
