@@ -28,7 +28,7 @@ The [ZarrReader BioFormats extension](https://github.com/ome/ZarrReader) support
 As we build & test our cloud-first solution, we need:
 
 1. a simple release cycle
-2. direct, low(-ish) level access to the data
+2. direct, low(-ish) level access to the data (mostly for scale optimization)
 
 A QuPath extension seems like the perfect fit.
 
