@@ -36,6 +36,7 @@ dependencies {
   implementation(kotlin("stdlib-jdk8"))
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
 
+  // For loading cblosc
   implementation("net.java.dev.jna:jna:5.16.0")
 
   // Main dependencies for most QuPath extensions
@@ -53,6 +54,10 @@ dependencies {
   implementation(platform("com.google.cloud:libraries-bom:26.43.0"))
   implementation("com.google.cloud:google-cloud-nio")
   implementation("com.google.cloud:google-cloud-storage")
+
+  // Other / utility
+  implementation("commons-cli:commons-cli:1.9.0")
+  implementation("commons-io:commons-io:2.16.1")
 
   // For testing
   testImplementation(libs.bundles.qupath)
