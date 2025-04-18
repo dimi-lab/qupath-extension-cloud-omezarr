@@ -72,7 +72,7 @@ class CloudOmeZarrServer(private val zarrBaseUri: URI, vararg args: String) : Ab
     val channels = omeChannelsToQuPath(omeMetadata)
 
     val omePixelType = omeMetadata.getPixelsType(0)
-    checkPixelType(omePixelType, omeMetadata.getPixelsBigEndian(0), scaleLevels)
+    checkPixelType(omePixelType, scaleLevels)
     val pixelType = omeXmlPixelTypeToQupath(omePixelType)
     colorModel = ColorModelFactory.createColorModel(pixelType, channels)
     logger.info("Pixel type: $pixelType; channels: ${channels.size}")

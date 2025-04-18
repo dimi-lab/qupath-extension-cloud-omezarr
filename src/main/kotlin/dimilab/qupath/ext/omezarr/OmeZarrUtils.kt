@@ -8,7 +8,6 @@ import org.slf4j.Logger
 import qupath.lib.images.servers.PixelType
 import java.awt.image.*
 import java.net.URI
-import java.nio.ByteOrder
 import java.nio.file.FileSystem
 import java.nio.file.FileSystems
 import java.nio.file.Path
@@ -37,7 +36,6 @@ fun omeXmlPixelTypeToZarrDtype(omeXmlPixelType: OmePixelType): com.bc.zarr.DataT
 
 fun checkPixelType(
   omePixelType: OmePixelType,
-  omeBigEndian: Boolean,
   scaleLevels: List<CloudOmeZarrServer.ScaleLevel>,
 ) {
   // This checks that the OME metadata and zarr were generated together correctly.
@@ -47,13 +45,6 @@ fun checkPixelType(
     if (zarrDtype != omeXmlPixelTypeToZarrDtype(omePixelType)) {
       throw IllegalArgumentException(
         "Zarr dtype ${zarrDtype.name} does not match OME XML pixel type ${omePixelType.name} for scale level ${scaleLevel.path}"
-      )
-    }
-
-    val zarrBigEndian = scaleLevel.zarrArray.byteOrder == ByteOrder.BIG_ENDIAN
-    if (omeBigEndian != zarrBigEndian) {
-      throw IllegalArgumentException(
-        "Zarr bigendian=${scaleLevel.zarrArray.byteOrder} does not match OME XML bigendian=$omeBigEndian for scale level ${scaleLevel.path}"
       )
     }
   }
