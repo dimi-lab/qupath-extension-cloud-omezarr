@@ -6,6 +6,7 @@ import loci.common.xml.XMLTools
 import loci.formats.ome.OMEXMLMetadata
 import loci.formats.services.OMEXMLService
 import ome.xml.model.enums.PixelType
+import ome.xml.model.primitives.Color
 import org.slf4j.Logger
 import org.xml.sax.SAXException
 import qupath.lib.common.ColorTools
@@ -16,6 +17,7 @@ import java.nio.file.Path
 import javax.xml.parsers.ParserConfigurationException
 import javax.xml.transform.TransformerException
 import kotlin.io.path.readBytes
+import kotlin.random.Random
 
 
 class OmeXmlUtils {
@@ -54,10 +56,31 @@ fun readOmeXml(metadataFile: Path): String {
   }
 }
 
+fun randomColor(): Color {
+  val minimumThreshold = 128
+
+  while (true) {
+    val color = Color(Random.nextInt(0, 256), Random.nextInt(0, 256), Random.nextInt(0, 256), 255)
+
+    // Make sure at least one color intensity is above the threshold
+    if (listOf(color.red, color.green, color.blue).any { it >= minimumThreshold }) {
+      return color
+    }
+  }
+}
+
 fun omeChannelsToQuPath(omeMetadata: OMEXMLMetadata): List<ImageChannel> {
   return (0 until omeMetadata.getChannelCount(0)).map { channelNum ->
     val name = omeMetadata.getChannelName(0, channelNum)
-    val color = omeMetadata.getChannelColor(0, channelNum)
+    val color = omeMetadata.getChannelColor(0, channelNum).let {
+      if (it == null) {
+        logger.warn("Channel $channelNum has no color set in OME XML metadata; picking randomly")
+        randomColor()
+      } else {
+        it
+      }
+    }
+
     val colorVal = ColorTools.packARGB(color.alpha, color.red, color.green, color.blue)
     ImageChannel.getInstance(name, colorVal)
   }
