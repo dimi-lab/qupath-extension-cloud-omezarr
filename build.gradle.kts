@@ -49,9 +49,10 @@ dependencies {
   implementation("org.openmicroscopy:ome-model:6.4.0")
   implementation("dev.zarr:jzarr:0.4.2")
 
-  // Google Cloud Storage NIO filesystem
-  implementation(platform("com.google.cloud:libraries-bom:23.0.0"))
+  // Google Cloud Storage
+  implementation(platform("com.google.cloud:libraries-bom:26.43.0"))
   implementation("com.google.cloud:google-cloud-nio")
+  implementation("com.google.cloud:google-cloud-storage")
 
   // For testing
   testImplementation(libs.bundles.qupath)
