@@ -128,6 +128,10 @@ class CloudOmeZarrServer(private val zarrBaseUri: URI, vararg args: String) : Ab
     )
   }
 
+  fun getImageArgs(): OmeZarrArgs {
+    return serverArgs
+  }
+
   override fun close() {
     zarrRoot.fileSystem.close()
     super.close()
