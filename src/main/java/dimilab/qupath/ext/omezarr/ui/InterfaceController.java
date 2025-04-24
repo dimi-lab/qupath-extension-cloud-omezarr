@@ -14,7 +14,7 @@ import java.util.ResourceBundle;
  * Controller for UI pane contained in interface.fxml
  */
 public class InterfaceController extends VBox {
-    private static final ResourceBundle resources = ResourceBundle.getBundle("dimilab.qupath.ext.cloud_omezarr.ui.strings");
+    private static final ResourceBundle resources = ResourceBundle.getBundle("dimilab.qupath.ext.omezarr.ui.strings");
 
     @FXML
     private Spinner<Integer> integerOptionSpinner;

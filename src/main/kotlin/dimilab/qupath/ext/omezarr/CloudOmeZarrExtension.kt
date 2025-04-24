@@ -1,16 +1,15 @@
 package dimilab.qupath.ext.omezarr
 
-import dimilab.qupath.ext.omezarr.ui.InterfaceController
 import javafx.beans.property.BooleanProperty
 import javafx.beans.property.Property
 import javafx.event.ActionEvent
 import javafx.event.EventHandler
-import javafx.scene.Scene
+import javafx.scene.control.Alert
+import javafx.scene.control.ButtonType
 import javafx.scene.control.MenuItem
-import javafx.stage.Stage
+import org.apache.commons.io.FileUtils
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import qupath.fx.dialogs.Dialogs
 import qupath.fx.prefs.controlsfx.PropertyItemBuilder
 import qupath.lib.common.Version
 import qupath.lib.gui.QuPathGUI
@@ -18,8 +17,12 @@ import qupath.lib.gui.extensions.GitHubProject
 import qupath.lib.gui.extensions.GitHubProject.GitHubRepo
 import qupath.lib.gui.extensions.QuPathExtension
 import qupath.lib.gui.prefs.PathPrefs
-import java.io.IOException
+import qupath.lib.io.PathIO
+import java.nio.file.Files
 import java.util.*
+import java.util.function.Consumer
+import java.util.function.Predicate
+
 
 class CloudOmeZarrExtension : QuPathExtension, GitHubProject {
 
@@ -27,12 +30,16 @@ class CloudOmeZarrExtension : QuPathExtension, GitHubProject {
     val logger: Logger = LoggerFactory.getLogger(CloudOmeZarrExtension::class.java)
 
     val resources: ResourceBundle = ResourceBundle.getBundle("dimilab.qupath.ext.omezarr.ui.strings")
+
     // Display name
     val EXTENSION_NAME: String = resources.getString("name")
+
     // Short description
     val EXTENSION_DESCRIPTION: String = resources.getString("description")
+
     // Expected QuPath version
     val EXTENSION_QUPATH_VERSION: Version = Version.parse("v0.5.0")
+
     // GitHub repo for updates
     val EXTENSION_REPOSITORY: GitHubRepo = GitHubRepo.create(
       EXTENSION_NAME, "dimi-lab", "qupath-extension-cloud-omezarr"
@@ -70,11 +77,6 @@ class CloudOmeZarrExtension : QuPathExtension, GitHubProject {
     return integerOption
   }
 
-  /**
-   * Create a stage for the extension to display
-   */
-  private var stage: Stage? = null
-
   override fun installExtension(qupath: QuPathGUI) {
     if (isInstalled) {
       logger.debug("{} is already installed", name)
@@ -110,32 +112,83 @@ class CloudOmeZarrExtension : QuPathExtension, GitHubProject {
    */
   private fun addMenuItem(qupath: QuPathGUI) {
     val menu = qupath.getMenu("Extensions>$EXTENSION_NAME", true)
-    val menuItem = MenuItem("OME-Zarr menu item")
-    menuItem.onAction = EventHandler { _: ActionEvent? -> createStage() }
-    menuItem.disableProperty().bind(enableExtensionProperty.not())
-    menu.items.add(menuItem)
+
+    val refreshPathObjectsMenuItem = MenuItem("Refresh remote PathObjects")
+    refreshPathObjectsMenuItem.onAction = EventHandler { _: ActionEvent? -> createRefreshRemotePathObjectsStage() }
+    refreshPathObjectsMenuItem.disableProperty().bind(enableExtensionProperty.not())
+    menu.items.add(refreshPathObjectsMenuItem)
+
+    val saveToRemoteMenuItem = MenuItem("Save image data to remote")
+    saveToRemoteMenuItem.onAction = EventHandler { _: ActionEvent? -> createSaveToRemoteStage() }
+    saveToRemoteMenuItem.disableProperty().bind(enableExtensionProperty.not())
+    menu.items.add(saveToRemoteMenuItem)
   }
 
   /**
    * Demo showing how to create a new stage with a JavaFX FXML interface.
    */
-  private fun createStage() {
-    if (stage == null) {
-      try {
-        stage = Stage()
-        val scene = Scene(InterfaceController.createInstance())
-        stage!!.initOwner(QuPathGUI.getInstance().stage)
-        stage!!.title = resources.getString("stage.title")
-        stage!!.scene = scene
-        stage!!.isResizable = false
-      } catch (e: IOException) {
-        Dialogs.showErrorMessage(resources.getString("error"), resources.getString("error.gui-loading-failed"))
-        logger.error("Unable to load extension interface FXML", e)
-      }
-    }
-    stage!!.show()
+  private fun createRefreshRemotePathObjectsStage() {
+    val dialog = Alert(
+      Alert.AlertType.CONFIRMATION,
+      "Delete all local path objects and refresh from server?"
+    )
+    dialog.showAndWait()
+      .filter(Predicate { response: ButtonType? -> response == ButtonType.OK })
+      .ifPresent(Consumer { response: ButtonType? -> doRefreshRemotePathObjects() })
   }
 
+  private fun doRefreshRemotePathObjects() {
+    val imageData = QuPathGUI.getInstance().imageData
+    val server = imageData.server
+    if (server !is CloudOmeZarrServer) {
+      logger.error("Image server is not a CloudOmeZarrServer")
+      return
+    }
+
+    // TODO: move this to a background thread, and add a spinner?
+
+    logger.info("Refreshing remote path objects from server: $server; ${server.getImageArgs().remoteQpDataPath}")
+    imageData.hierarchy.clearAll()
+    imageData.hierarchy.addObjects(server.readPathObjects())
+    logger.info("Path objects refreshed")
+  }
+
+  private fun createSaveToRemoteStage() {
+    val dialog = Alert(
+      Alert.AlertType.CONFIRMATION,
+      "Save image data to remote storage?"
+    )
+    dialog.showAndWait()
+      .filter(Predicate { response: ButtonType? -> response == ButtonType.OK })
+      .ifPresent(Consumer { response: ButtonType? -> doSaveToRemote() })
+  }
+
+  private fun doSaveToRemote() {
+    val imageData = QuPathGUI.getInstance().imageData
+    val server = imageData.server
+    if (server !is CloudOmeZarrServer) {
+      logger.error("Image server is not a CloudOmeZarrServer")
+      return
+    }
+    val remotePath = server.getImageArgs().remoteQpDataPath
+    if (remotePath == null) {
+      logger.error("Remote qpdata path is null")
+      return
+    }
+
+    val localFile = Files.createTempFile("qupath-cloudomezarr", ".qpdata")
+    Runtime.getRuntime().addShutdownHook(Thread { FileUtils.forceDelete(localFile.toFile()) })
+
+    // TODO: move this to a background thread, and add a spinner?
+
+    logger.info("Writing image data to temp file: $localFile")
+    PathIO.writeImageData(localFile, imageData)
+
+    logger.info("Uploading image data to: $remotePath")
+    val time = System.currentTimeMillis()
+    uploadToStorage(localFile, remotePath.toBlobId())
+    logger.info("Image data uploaded in ${System.currentTimeMillis() - time} ms")
+  }
 
   override fun getName(): String {
     return EXTENSION_NAME

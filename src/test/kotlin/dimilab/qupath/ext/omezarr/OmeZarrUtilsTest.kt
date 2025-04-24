@@ -26,6 +26,17 @@ class OmeZarrUtilsTest {
   }
 
   @Test
+  fun getZarrRoot_gs_underscore() {
+    // Bucket names with underscores need special treatment…
+    val uri = URI.create("gs://a_bucket/folder/animage.zarr/")
+    val zarrRoot = getZarrRoot(uri)
+    assertEquals("gs", zarrRoot.fileSystem.provider().scheme)
+    assertIs<CloudStorageFileSystem>(zarrRoot.fileSystem)
+    assertEquals("a_bucket", (zarrRoot.fileSystem as CloudStorageFileSystem).bucket())
+    assertEquals("/folder/animage.zarr/", zarrRoot.toString())
+  }
+
+  @Test
   fun getZarrRoot_unsupported() {
     val uri = URI.create("s3://a-bucket/folder/animage.zarr/")
     val exception = kotlin.runCatching { getZarrRoot(uri) }.exceptionOrNull()

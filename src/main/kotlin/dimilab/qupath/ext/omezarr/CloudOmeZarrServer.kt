@@ -3,6 +3,7 @@ package dimilab.qupath.ext.omezarr
 import com.bc.zarr.ZarrArray
 import com.bc.zarr.ZarrGroup
 import loci.formats.ome.OMEXMLMetadata
+import org.apache.commons.cli.*
 import qupath.lib.color.ColorModelFactory
 import qupath.lib.images.servers.AbstractTileableImageServer
 import qupath.lib.images.servers.ImageServerBuilder
@@ -10,19 +11,28 @@ import qupath.lib.images.servers.ImageServerBuilder.DefaultImageServerBuilder
 import qupath.lib.images.servers.ImageServerMetadata
 import qupath.lib.images.servers.ImageServerMetadata.ImageResolutionLevel
 import qupath.lib.images.servers.TileRequest
+import qupath.lib.io.PathIO
+import qupath.lib.objects.PathObject
+import qupath.lib.objects.PathObjectReader
 import java.awt.image.BufferedImage
 import java.awt.image.ColorModel
 import java.io.IOException
 import java.net.URI
 import java.nio.file.Path
+import java.util.*
 
 
-class CloudOmeZarrServer(private val zarrBaseUri: URI, vararg args: String) : AbstractTileableImageServer() {
+class CloudOmeZarrServer(private val zarrBaseUri: URI, vararg args: String) : AbstractTileableImageServer(),
+  PathObjectReader {
   companion object {
     private val logger = org.slf4j.LoggerFactory.getLogger(CloudOmeZarrServer::class.java)
   }
 
   private val zarrRoot: Path
+
+  data class OmeZarrArgs(
+    val remoteQpDataPath: URI?,
+  )
 
   data class OmeZarrMetadata(
     val imageName: String,
@@ -30,7 +40,8 @@ class CloudOmeZarrServer(private val zarrBaseUri: URI, vararg args: String) : Ab
   )
 
   private val metadata: ImageServerMetadata
-  private val serverArgs = args
+  private val originalArgs = arrayOf(*args)
+  private val serverArgs: OmeZarrArgs
 
   data class ScaleLevel(
     val path: String,
@@ -50,6 +61,8 @@ class CloudOmeZarrServer(private val zarrBaseUri: URI, vararg args: String) : Ab
 
   init {
     logger.info("Creating CloudOmeZarrServer from $zarrBaseUri with args: ${args.joinToString(" ")}")
+
+    serverArgs = parseArgs(originalArgs)
 
     zarrRoot = getZarrRoot(zarrBaseUri)
     logger.info("Loading base array at $zarrRoot")
@@ -72,7 +85,7 @@ class CloudOmeZarrServer(private val zarrBaseUri: URI, vararg args: String) : Ab
     val channels = omeChannelsToQuPath(omeMetadata)
 
     val omePixelType = omeMetadata.getPixelsType(0)
-    checkPixelType(omePixelType, omeMetadata.getPixelsBigEndian(0), scaleLevels)
+    checkPixelType(omePixelType, scaleLevels)
     val pixelType = omeXmlPixelTypeToQupath(omePixelType)
     colorModel = ColorModelFactory.createColorModel(pixelType, channels)
     logger.info("Pixel type: $pixelType; channels: ${channels.size}")
@@ -89,6 +102,34 @@ class CloudOmeZarrServer(private val zarrBaseUri: URI, vararg args: String) : Ab
         .pixelType(pixelType)
         .channels(channels)
         .preferredTileSize(scaleLevels[0].tileWidth, scaleLevels[0].tileHeight).build()
+  }
+
+  private fun parseArgs(args: Array<String>): OmeZarrArgs {
+    val options = Options()
+
+    val remoteFileOption = Option.builder().longOpt("qpdata-path")
+      .argName("path")
+      .hasArg()
+      .desc("set the remote QuPath qpdata path")
+      .build()
+    options.addOption(remoteFileOption)
+
+    val parser: CommandLineParser = DefaultParser()
+    val line: CommandLine? = parser.parse(options, args)
+
+    val remoteQpDataUri = if (line?.hasOption("qpdata-path") == true) {
+      URI.create(line.getOptionValue("qpdata-path"))
+    } else {
+      null
+    }
+
+    return OmeZarrArgs(
+      remoteQpDataPath = remoteQpDataUri,
+    )
+  }
+
+  fun getImageArgs(): OmeZarrArgs {
+    return serverArgs
   }
 
   override fun close() {
@@ -164,12 +205,12 @@ class CloudOmeZarrServer(private val zarrBaseUri: URI, vararg args: String) : Ab
       CloudOmeZarrServerBuilder::class.java,
       metadata,
       zarrBaseUri,
-      *serverArgs,
+      *originalArgs,
     )
   }
 
   override fun createID(): String {
-    return "CloudOmeZarrServer: $zarrBaseUri ${serverArgs.joinToString(" ")}"
+    return "CloudOmeZarrServer: $zarrBaseUri ${originalArgs.joinToString(" ")}"
   }
 
   override fun readTile(tileRequest: TileRequest?): BufferedImage {
@@ -202,13 +243,39 @@ class CloudOmeZarrServer(private val zarrBaseUri: URI, vararg args: String) : Ab
     )
   }
 
+  override fun readPathObjects(): MutableCollection<PathObject> {
+    if (serverArgs.remoteQpDataPath == null) {
+      logger.error("Can't load path objects from null remote path")
+      return Collections.emptyList()
+    }
+
+    logger.info("Reading image data from remote path: ${serverArgs.remoteQpDataPath}")
+    val startTime = System.currentTimeMillis()
+    val downloads = downloadUrisToTemp(listOf(serverArgs.remoteQpDataPath))
+    logger.info("Downloaded remote path in ${System.currentTimeMillis() - startTime} ms")
+    val localPath = downloads[serverArgs.remoteQpDataPath] ?: throw IOException("Failed to download remote path")
+
+    val imageData = PathIO.readImageData<BufferedImage>(localPath, null, this, null)
+    val objects = imageData.hierarchy.rootObject.childObjects.toMutableList()
+
+    logger.info("Image data read; extracting {} root objects", objects.size)
+
+    return objects
+  }
+
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
     if (other !is CloudOmeZarrServer) return false
 
     if (zarrBaseUri != other.zarrBaseUri) return false
-    if (!serverArgs.contentEquals(other.serverArgs)) return false
+    if (serverArgs != other.serverArgs) return false
 
     return true
+  }
+
+  override fun hashCode(): Int {
+    var result = zarrBaseUri.hashCode()
+    result = 31 * result + serverArgs.hashCode()
+    return result
   }
 }

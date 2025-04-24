@@ -1,14 +1,16 @@
 package dimilab.qupath.ext.omezarr
 
 import com.bc.zarr.ZarrArray
-import com.google.cloud.storage.contrib.nio.CloudStorageFileSystemProvider
+import com.google.cloud.storage.BlobId
+import com.google.cloud.storage.StorageOptions
+import com.google.cloud.storage.contrib.nio.CloudStorageConfiguration
+import com.google.cloud.storage.contrib.nio.CloudStorageFileSystem
 import dimilab.qupath.ext.omezarr.OmeZarrUtils.Companion.logger
 import kotlinx.coroutines.*
 import org.slf4j.Logger
 import qupath.lib.images.servers.PixelType
 import java.awt.image.*
 import java.net.URI
-import java.nio.ByteOrder
 import java.nio.file.FileSystem
 import java.nio.file.FileSystems
 import java.nio.file.Path
@@ -37,7 +39,6 @@ fun omeXmlPixelTypeToZarrDtype(omeXmlPixelType: OmePixelType): com.bc.zarr.DataT
 
 fun checkPixelType(
   omePixelType: OmePixelType,
-  omeBigEndian: Boolean,
   scaleLevels: List<CloudOmeZarrServer.ScaleLevel>,
 ) {
   // This checks that the OME metadata and zarr were generated together correctly.
@@ -47,13 +48,6 @@ fun checkPixelType(
     if (zarrDtype != omeXmlPixelTypeToZarrDtype(omePixelType)) {
       throw IllegalArgumentException(
         "Zarr dtype ${zarrDtype.name} does not match OME XML pixel type ${omePixelType.name} for scale level ${scaleLevel.path}"
-      )
-    }
-
-    val zarrBigEndian = scaleLevel.zarrArray.byteOrder == ByteOrder.BIG_ENDIAN
-    if (omeBigEndian != zarrBigEndian) {
-      throw IllegalArgumentException(
-        "Zarr bigendian=${scaleLevel.zarrArray.byteOrder} does not match OME XML bigendian=$omeBigEndian for scale level ${scaleLevel.path}"
       )
     }
   }
@@ -144,21 +138,24 @@ fun renderZarrToBufferedImage(
   return BufferedImage(colorModel, raster, false, null)
 }
 
-fun uriToFileSystem(rootUri: URI): FileSystem {
-  return when (rootUri.scheme) {
+fun uriToFileSystem(uri: URI): FileSystem {
+  return when (uri.scheme) {
     "gs" -> {
-      CloudStorageFileSystemProvider().getFileSystem(rootUri)
+      val b = BlobId.fromGsUtilUri(uri.toString())
+      val config = CloudStorageConfiguration.DEFAULT
+      CloudStorageFileSystem.forBucket(b.bucket, config, StorageOptions.getDefaultInstance())
     }
 
     else -> {
-      FileSystems.getFileSystem(rootUri)
+      // Unix file system expects root path (path = '/')
+      FileSystems.getFileSystem(uri.resolve("/"))
     }
   }
 }
 
 fun getZarrRoot(uri: URI): Path {
   val zarrFs = try {
-    uriToFileSystem(uri.resolve("/"))
+    uriToFileSystem(uri)
   } catch (e: ProviderNotFoundException) {
     logger.error("No java.nio FileSystemProvider found for scheme '{}', uri: {}", uri.scheme, uri, e)
     throw IllegalArgumentException("Unsupported scheme '${uri.scheme}'")
