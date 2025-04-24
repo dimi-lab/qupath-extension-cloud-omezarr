@@ -250,15 +250,17 @@ class CloudOmeZarrServer(private val zarrBaseUri: URI, vararg args: String) : Ab
     }
 
     logger.info("Reading image data from remote path: ${serverArgs.remoteQpDataPath}")
-
+    val startTime = System.currentTimeMillis()
     val downloads = downloadUrisToTemp(listOf(serverArgs.remoteQpDataPath))
+    logger.info("Downloaded remote path in ${System.currentTimeMillis() - startTime} ms")
     val localPath = downloads[serverArgs.remoteQpDataPath] ?: throw IOException("Failed to download remote path")
 
     val imageData = PathIO.readImageData<BufferedImage>(localPath, null, this, null)
+    val objects = imageData.hierarchy.rootObject.childObjects.toMutableList()
 
-    logger.info("Image data read; extracting hierarchy root object")
+    logger.info("Image data read; extracting {} root objects", objects.size)
 
-    return imageData.hierarchy.rootObject.childObjects.toMutableList()
+    return objects
   }
 
   override fun equals(other: Any?): Boolean {

@@ -7,6 +7,7 @@ import javafx.event.EventHandler
 import javafx.scene.control.Alert
 import javafx.scene.control.ButtonType
 import javafx.scene.control.MenuItem
+import org.apache.commons.io.FileUtils
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import qupath.fx.prefs.controlsfx.PropertyItemBuilder
@@ -16,6 +17,8 @@ import qupath.lib.gui.extensions.GitHubProject
 import qupath.lib.gui.extensions.GitHubProject.GitHubRepo
 import qupath.lib.gui.extensions.QuPathExtension
 import qupath.lib.gui.prefs.PathPrefs
+import qupath.lib.io.PathIO
+import java.nio.file.Files
 import java.util.*
 import java.util.function.Consumer
 import java.util.function.Predicate
@@ -114,6 +117,11 @@ class CloudOmeZarrExtension : QuPathExtension, GitHubProject {
     refreshPathObjectsMenuItem.onAction = EventHandler { _: ActionEvent? -> createRefreshRemotePathObjectsStage() }
     refreshPathObjectsMenuItem.disableProperty().bind(enableExtensionProperty.not())
     menu.items.add(refreshPathObjectsMenuItem)
+
+    val saveToRemoteMenuItem = MenuItem("Save image data to remote")
+    saveToRemoteMenuItem.onAction = EventHandler { _: ActionEvent? -> createSaveToRemoteStage() }
+    saveToRemoteMenuItem.disableProperty().bind(enableExtensionProperty.not())
+    menu.items.add(saveToRemoteMenuItem)
   }
 
   /**
@@ -145,6 +153,42 @@ class CloudOmeZarrExtension : QuPathExtension, GitHubProject {
     logger.info("Path objects refreshed")
   }
 
+  private fun createSaveToRemoteStage() {
+    val dialog = Alert(
+      Alert.AlertType.CONFIRMATION,
+      "Save image data to remote storage?"
+    )
+    dialog.showAndWait()
+      .filter(Predicate { response: ButtonType? -> response == ButtonType.OK })
+      .ifPresent(Consumer { response: ButtonType? -> doSaveToRemote() })
+  }
+
+  private fun doSaveToRemote() {
+    val imageData = QuPathGUI.getInstance().imageData
+    val server = imageData.server
+    if (server !is CloudOmeZarrServer) {
+      logger.error("Image server is not a CloudOmeZarrServer")
+      return
+    }
+    val remotePath = server.getImageArgs().remoteQpDataPath
+    if (remotePath == null) {
+      logger.error("Remote qpdata path is null")
+      return
+    }
+
+    val localFile = Files.createTempFile("qupath-cloudomezarr", ".qpdata")
+    Runtime.getRuntime().addShutdownHook(Thread { FileUtils.forceDelete(localFile.toFile()) })
+
+    // TODO: move this to a background thread, and add a spinner?
+
+    logger.info("Writing image data to temp file: $localFile")
+    PathIO.writeImageData(localFile, imageData)
+
+    logger.info("Uploading image data to: $remotePath")
+    val time = System.currentTimeMillis()
+    uploadToStorage(localFile, remotePath.toBlobId())
+    logger.info("Image data uploaded in ${System.currentTimeMillis() - time} ms")
+  }
 
   override fun getName(): String {
     return EXTENSION_NAME

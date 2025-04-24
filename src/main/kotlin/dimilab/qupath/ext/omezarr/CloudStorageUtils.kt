@@ -2,6 +2,7 @@ package dimilab.qupath.ext.omezarr
 
 import com.google.cloud.storage.BlobId
 import com.google.cloud.storage.BlobInfo
+import com.google.cloud.storage.StorageOptions
 import com.google.cloud.storage.transfermanager.ParallelDownloadConfig
 import com.google.cloud.storage.transfermanager.TransferManagerConfig
 import com.google.cloud.storage.transfermanager.TransferStatus
@@ -22,18 +23,11 @@ class CloudStorageUtils {
 }
 
 fun downloadUrisToTemp(uris: List<URI>): Map<URI, Path> {
-  val transferManager = TransferManagerConfig
-    .newBuilder()
-    .setAllowDivideAndConquerDownload(true)
-    .build()
-    .service
-
   val remoteBlobs = uris.map { uri ->
     if (uri.scheme != "gs") {
       throw IllegalArgumentException("Unsupported scheme '${uri.scheme}'")
     }
-    val blobId = BlobId.fromGsUtilUri(uri.toString())
-    BlobInfo.newBuilder(blobId).build()
+    BlobInfo.newBuilder(uri.toBlobId()).build()
   }
 
   val bucket = remoteBlobs.first().bucket
@@ -53,6 +47,12 @@ fun downloadUrisToTemp(uris: List<URI>): Map<URI, Path> {
   Runtime.getRuntime().addShutdownHook(Thread { FileUtils.forceDelete(localRoot.toFile()) })
 
   logger.info("Downloading {} blobs to {}: {}", remoteBlobs.size, localRoot, remoteBlobs)
+
+  val transferManager = TransferManagerConfig
+    .newBuilder()
+    .setAllowDivideAndConquerDownload(true)
+    .build()
+    .service
 
   val results = transferManager.use {
     val downloadConfig = ParallelDownloadConfig
@@ -77,4 +77,21 @@ fun downloadUrisToTemp(uris: List<URI>): Map<URI, Path> {
 
     localPath
   }
+}
+
+fun uploadToStorage(path: Path, target: BlobId) {
+  val blobInfo = BlobInfo.newBuilder(target.bucket, target.name).build()
+
+  val service = StorageOptions.newBuilder().build().service
+  service.createFrom(blobInfo, path)
+}
+
+// Extension function to convert a gs:// URI to a BlobId
+fun URI.toBlobId(): BlobId {
+  return this.toString().toBlobId()
+}
+
+// Extension function to convert a string like gs://bucket/path to a BlobId
+fun String.toBlobId(): BlobId {
+  return BlobId.fromGsUtilUri(this)
 }
