@@ -3,9 +3,17 @@ QuPath extension to load OME-Zarr images from cloud storage
 
 ## Instructions
 
-1. Download the extension JAR from …
-2. Drag and drop the JAR onto QuPath.
-3. Restart QuPath.
+1. Log in to gcloud. You will need to do this regularly, depending on your credential expiration policies.
+
+   `gcloud auth application-default login`
+
+   Make sure to restart QuPath after logging in.
+
+2. Download the extension JAR from …
+
+3. Drag and drop the JAR onto QuPath.
+
+4. Restart QuPath.
 
 You can now add remote images to your QuPath project.
 
@@ -32,6 +40,10 @@ You can now add remote images to your QuPath project.
    1. Repeat this process in another project (or simply copy the project file).
    2. If necessary, click "Refresh remote PathObjects" in the extension menu.
 
+
+
+If you get any errors, please check the logs and report here. Auth errors are common if your login tokens expire after 24 hours, as is common in some enterprise environments.
+
 ## Demo
 
 The extension is currently capable of reading an OME-Zarr file (as output by bioformats2raw spec version 0.4). Here is a demo showing the LuCa7 file [described here](src/test/resources/test.zarr/README.md):
@@ -53,6 +65,7 @@ Known issues:
 * If you load from the cloud, it won't detect 
 * The extension has no concept of which annotations have/haven't changed, it saves/loads everything.
 * Adding `gs://bucket/file.zarr` image URIs doesn't work on Windows.
+* Auth failures are not displayed very intuitively, you need to read through the logs.
 
 ## Why an extension?
 
