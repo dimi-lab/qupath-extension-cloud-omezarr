@@ -1,3 +1,5 @@
+import java.util.Locale
+
 plugins {
   // To optionally create a shadow/fat jar that bundle up any non-core dependencies
   id("com.gradleup.shadow") version "8.3.5"
@@ -50,6 +52,22 @@ dependencies {
   implementation("org.openmicroscopy:ome-model:6.4.0")
   implementation("dev.zarr:jzarr:0.4.2")
 
+  val cbloscArch = let {
+    val isWindows = System.getProperty("os.name").lowercase(Locale.ENGLISH).contains("win")
+    val isUnixish = System.getProperty("os.name").lowercase(Locale.ENGLISH).contains("nix") || System.getProperty("os.name").lowercase(Locale.ENGLISH).contains("nux")
+    val isAppleArch = System.getProperty("os.arch").equals("aarch64", ignoreCase = true)
+
+    when {
+      isWindows -> "win32-x86_64"
+      isUnixish ->
+        if (isAppleArch) "linux-aarch64" else "linux-x86_64"
+      System.getProperty("os.name").lowercase(Locale.ENGLISH).contains("mac") ->
+        if (isAppleArch) "darwin-aarch64" else "darwin-x86_64"
+      else -> ""
+    }
+  }
+  implementation("io.github.qupath:blosc:1.21.6+01:${cbloscArch}")
+
   // Google Cloud Storage
   implementation(platform("com.google.cloud:libraries-bom:26.43.0"))
   implementation("com.google.cloud:google-cloud-nio")
@@ -70,19 +88,5 @@ repositories {
 }
 
 tasks.withType<Test> {
-  doFirst {
-    environment("JAVA_OPTS", "-Djna.library.path=${System.getenv("CBLOSC_LIB")}")
-    // Need to do something different for non-Mac builds
-    environment("DYLD_LIBRARY_PATH", System.getenv("CBLOSC_LIB"))
-  }
-
   useJUnitPlatform()
-}
-
-tasks.withType<Exec> {
-  doFirst {
-    environment("JAVA_OPTS", "-Djna.library.path=${System.getenv("CBLOSC_LIB")}")
-    // Need to do something different for non-Mac builds
-    environment("DYLD_LIBRARY_PATH", System.getenv("CBLOSC_LIB"))
-  }
 }
