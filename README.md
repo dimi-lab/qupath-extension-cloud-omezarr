@@ -1,17 +1,58 @@
 # qupath-ext-cloud-omezarr
 QuPath extension to load OME-Zarr images from cloud storage
 
+## Instructions
+
+1. Download the extension JAR from …
+2. Drag and drop the JAR onto QuPath.
+3. Restart QuPath.
+
+You can now add remote images to your QuPath project.
+
+1. Create a new project, or open an existing one.
+
+2. Add a new image using the project button.
+
+   ![QuPath add images button](images/qupath-add-images.png)
+
+3. Add the image by URL.
+
+   ![QuPath button to import image by URL](images/qupath-import-url.png)
+
+   1. For example, enter something like: `gs://my-bucket/my-data/images/LuCa-7color.zarr`
+
+4. To load annotations, check "Import Objects" then set the optional args to `--qpdata-path <your qpdata file`
+
+   1. For example, something like: `--qpdata-path gs://my-bucket/my-data/annotations/LuCa-7color/data.qpdata`
+
+5. Add annotations, then save to cloud.
+
+6. Load the annotations elsewhere:
+
+   1. Repeat this process in another project (or simply copy the project file).
+   2. If necessary, click "Refresh remote PathObjects" in the extension menu.
+
 ## Demo
 
-The extension is currently capable of reading an OME-Zarr file (as output by bioformats2raw spec version 0.4). The input file is LuCa7 [described here](src/test/resources/test.zarr/README.md).
+The extension is currently capable of reading an OME-Zarr file (as output by bioformats2raw spec version 0.4). Here is a demo showing the LuCa7 file [described here](src/test/resources/test.zarr/README.md):
 
 ![Loading an OME-Zarr image](images/luca7-omezarr.png)
+
+Once you have created some annotations, you can save them to the cloud. You can also refresh your local copy from the cloud.
+
+![Visualizing the extension menu in QuPath](images/extension-menu.png)
 
 ## Warning: experimental extension
 
 ⚠️ Use this extension at your own risk ⚠️
-
 Its API & behavior are likely to change.
+
+Known issues:
+
+* If you save to the cloud, it will replace whatever's there without question.
+* If you load from the cloud, it won't detect 
+* The extension has no concept of which annotations have/haven't changed, it saves/loads everything.
+* Adding `gs://bucket/file.zarr` image URIs doesn't work on Windows.
 
 ## Why an extension?
 
@@ -34,17 +75,25 @@ A QuPath extension seems like the perfect fit.
 
 ## Build instructions
 
-You need [c-blosc](https://github.com/Blosc/c-blosc) to run the test suite.
+You should be able to build the extension like a usual gradle project.
 
-Platform instructions:
+```sh
+./gradlew shadowJar
+```
 
-* On Mac, `brew install c-blosc`, then record the results of: `echo $(brew --cellar c-blosc)/*/lib/`
-* [untested] On Ubuntu, `apt-get install libblosc1`, and that's it?
-* [untested] On Windows, download from the [Fiji project](https://sites.imagej.net/N5/lib/win64/), and take note of where you placed it
+You can run the tests like so:
 
-Set `CBLOSC_LIB` to the location containing the library.
+```sh
+./gradlew cleanTest test
+```
+
+### Binary compatibility note
+
+The extension relies on native C-Blosc binaries from the [QuPath project](https://github.com/qupath/c-blosc-jars). It should work for these architectures: Windows-x86-64, Linux-x86-64, Linux-aarch64, Mac-x86-64, and Mac-aarch64.
 
 ## Runtime instructions
 
-To load images with the c-blosc compression algorithm, you need to configure QuPath with the library location as above. See [QuPath setup instructions](https://github.com/qupath/qupath/wiki/Working-with-Python#setup) for Java Embedded Python, you need to edit the config or launch with a flag as specified.
+See binary compatibility note above.
+
+As of 2025-04-30, the built-in binary dependencies have only been tested on Mac-aarch64 (David's laptop).
 
