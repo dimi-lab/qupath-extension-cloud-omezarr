@@ -1,6 +1,6 @@
 # Adapted from: https://github.com/qupath/c-blosc-jars/blob/620bbbb6cdbbf5bef1eb100d7916bffad256791b/.github/workflows/jars.yml
 
-name: Make platform extension JARs
+name: Build self-contained extension JAR
 on:
   workflow_dispatch:
     inputs:
@@ -38,3 +38,29 @@ jobs:
         with:
           name: extension-jars
           path: build/libs/qupath-extension-cloud-omezarr-${{ inputs.extension_version }}-all.jar
+
+  release:
+    needs: build-shadow-jar
+    name: Draft release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+          pattern: extension-jars
+
+      - name: Get current date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y-%m-%d-%H:%M:%S')"
+
+      - name: Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create --draft v${{ steps.date.outputs.date }} \
+              --target ${{ github.sha }} \
+              --title "Development build ${{ steps.date.outputs.date }}" \
+              qupath-extension-cloud-omezarr-${{ inputs.extension_version }}-all.jar
