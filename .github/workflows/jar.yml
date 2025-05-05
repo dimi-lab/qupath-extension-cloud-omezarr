@@ -1,0 +1,40 @@
+# Adapted from: https://github.com/qupath/c-blosc-jars/blob/620bbbb6cdbbf5bef1eb100d7916bffad256791b/.github/workflows/jars.yml
+
+name: Make platform extension JARs
+on:
+  workflow_dispatch:
+    inputs:
+      extension_version:
+        description: Semantic version of qupath-ext-cloud-omezarr to package.
+        type: string
+        default: "0.1.0-SNAPSHOT"
+        required: true
+  workflow_call:
+    inputs:
+      extension_version:
+        description: Semantic version of qupath-ext-cloud-omezarr to package.
+        type: string
+        default: "0.1.0-SNAPSHOT"
+        required: true
+
+jobs:
+  build-shadow-jar:
+    name: build-shadow-jar
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 17
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+      - name: Build with Gradle
+        run: ./gradlew shadowJar
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: extension-jars
+          path: build/libs/qupath-extension-cloud-omezarr-${{ inputs.extension_version }}-all.jar
