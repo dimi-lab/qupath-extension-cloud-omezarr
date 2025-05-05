@@ -52,21 +52,22 @@ dependencies {
   implementation("org.openmicroscopy:ome-model:6.4.0")
   implementation("dev.zarr:jzarr:0.4.2")
 
-  val cbloscArch = let {
-    val isWindows = System.getProperty("os.name").lowercase(Locale.ENGLISH).contains("win")
-    val isUnixish = System.getProperty("os.name").lowercase(Locale.ENGLISH).contains("nix") || System.getProperty("os.name").lowercase(Locale.ENGLISH).contains("nux")
-    val isAppleArch = System.getProperty("os.arch").equals("aarch64", ignoreCase = true)
-
-    when {
-      isWindows -> "win32-x86_64"
-      isUnixish ->
-        if (isAppleArch) "linux-aarch64" else "linux-x86_64"
-      System.getProperty("os.name").lowercase(Locale.ENGLISH).contains("mac") ->
-        if (isAppleArch) "darwin-aarch64" else "darwin-x86_64"
-      else -> ""
-    }
-  }
-  implementation("io.github.qupath:blosc:1.21.6+01:${cbloscArch}")
+//  val cbloscArch = let {
+//    val isWindows = System.getProperty("os.name").lowercase(Locale.ENGLISH).contains("win")
+//    val isUnixish = System.getProperty("os.name").lowercase(Locale.ENGLISH).contains("nix") || System.getProperty("os.name").lowercase(Locale.ENGLISH).contains("nux")
+//    val isAppleArch = System.getProperty("os.arch").equals("aarch64", ignoreCase = true)
+//
+//    when {
+//      isWindows -> "win32-x86_64"
+//      isUnixish ->
+//        if (isAppleArch) "linux-aarch64" else "linux-x86_64"
+//      System.getProperty("os.name").lowercase(Locale.ENGLISH).contains("mac") ->
+//        if (isAppleArch) "darwin-aarch64" else "darwin-x86_64"
+//      else -> ""
+//    }
+//  }
+//  implementation("io.github.qupath:blosc:1.21.6+01:${cbloscArch}")
+  implementation("io.github.qupath:blosc:1.21.6+01")
 
   // Google Cloud Storage
   implementation(platform("com.google.cloud:libraries-bom:26.43.0"))
