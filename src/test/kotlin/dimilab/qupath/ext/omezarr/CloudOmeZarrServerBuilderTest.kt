@@ -6,6 +6,7 @@ import com.google.cloud.storage.StorageOptions
 import com.google.cloud.storage.contrib.nio.testing.LocalStorageHelper
 import io.mockk.every
 import io.mockk.mockkStatic
+import java.io.File
 import java.net.URI
 import java.nio.file.Files
 import kotlin.io.path.isDirectory
@@ -43,7 +44,8 @@ class CloudOmeZarrServerBuilderTest {
     }
 
     // Test with a Windows munged URI
-    builder.checkImageSupport(URI.create("file:/C:/some-folder/gs:/a-bucket/a-folder/test.zarr")).let {
+    val windowsFile = File("C:\\some-folder\\gs:/a-bucket/a-folder/test.zarr")
+    builder.checkImageSupport(windowsFile.toURI()).let {
       assertNotNull(it)
       assertEquals(5f, it.supportLevel)
       assertEquals("gs://a-bucket/a-folder/test.zarr", it.builders.first().urIs.first().toString())
