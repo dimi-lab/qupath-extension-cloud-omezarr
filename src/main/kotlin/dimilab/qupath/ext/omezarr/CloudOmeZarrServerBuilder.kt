@@ -1,16 +1,23 @@
 package dimilab.qupath.ext.omezarr
 
+import com.google.api.client.googleapis.json.GoogleJsonResponseException
+import com.google.cloud.storage.StorageException
 import qupath.lib.images.servers.ImageServer
 import qupath.lib.images.servers.ImageServerBuilder
 import qupath.lib.images.servers.ImageServerBuilder.DefaultImageServerBuilder
 import qupath.lib.images.servers.ImageServerBuilder.UriImageSupport
 import qupath.lib.images.servers.ImageServerMetadata
 import java.awt.image.BufferedImage
+import java.io.IOException
 import java.net.URI
 
 class CloudOmeZarrServerBuilder : ImageServerBuilder<BufferedImage> {
   companion object {
     private val logger = org.slf4j.LoggerFactory.getLogger(CloudOmeZarrServerBuilder::class.java)
+  }
+
+  class UnauthorizedError : IOException {
+    constructor(message: String) : super(message)
   }
 
   override fun checkImageSupport(uri: URI?, vararg args: String?): UriImageSupport<BufferedImage>? {
@@ -82,6 +89,16 @@ class CloudOmeZarrServerBuilder : ImageServerBuilder<BufferedImage> {
 
     try {
       return CloudOmeZarrServer(uri, *args)
+    } catch (e: StorageException) {
+      if (e.cause is GoogleJsonResponseException) {
+        val responseException = e.cause as GoogleJsonResponseException
+        if (responseException.statusCode == 401) {
+          logger.error("Error: not authorized to access {}: {}", uri, responseException.message)
+          throw UnauthorizedError("Access error. Quit QuPath and run this: gcloud auth application-default login")
+        }
+      }
+      logger.error("Google Cloud Storage exception: {}", e.message, e)
+      return null
     } catch (e: Exception) {
       logger.error("Cloud OME-Zarr couldn't open {}: {}", uri, e.message, e)
       return null
