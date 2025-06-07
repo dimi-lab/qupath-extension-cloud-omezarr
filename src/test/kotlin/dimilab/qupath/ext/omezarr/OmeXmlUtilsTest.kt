@@ -8,6 +8,9 @@ class OmeXmlUtilsTest {
   private val testZarrRootUri = CloudOmeZarrServer::class.java.classLoader.getResource("test.zarr/")?.toURI()
     ?: throw IllegalStateException("Could not find test.zarr")
 
+  private val testOmeMetadataRootUri = CloudOmeZarrServer::class.java.classLoader.getResource("test-ome-metadata/")?.toURI()
+    ?: throw IllegalStateException("Could not find test-ome-metadata")
+
   @Test
   fun testOmeChannelsToQuPath() {
     val omeBase = testZarrRootUri.resolve("OME/").toPath()
@@ -32,5 +35,18 @@ class OmeXmlUtilsTest {
     assertEquals(0xFF0000FF.toInt(), channels[6].color)
     assertEquals("Autofluorescence", channels[7].name)
     assertEquals(0xFF000000.toInt(), channels[7].color)
+  }
+
+  @Test
+  fun testOmeChannelsToQuPathMissingNames() {
+    val omeBase = testOmeMetadataRootUri.resolve("missing-channel-names/").toPath()
+    val omeZarrMetadata = parseOmeXmlMetadata(omeBase)
+    val channels = omeChannelsToQuPath(omeZarrMetadata)
+
+    assertEquals(channels.size, 3)
+
+    assertEquals("Channel 0", channels[0].name)
+    assertEquals("Channel 1 Is Present", channels[1].name)
+    assertEquals("Channel 2", channels[2].name)
   }
 }

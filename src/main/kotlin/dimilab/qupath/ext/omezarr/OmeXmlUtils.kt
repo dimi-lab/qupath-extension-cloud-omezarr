@@ -71,7 +71,7 @@ fun randomColor(): Color {
 
 fun omeChannelsToQuPath(omeMetadata: OMEXMLMetadata): List<ImageChannel> {
   return (0 until omeMetadata.getChannelCount(0)).map { channelNum ->
-    val name = omeMetadata.getChannelName(0, channelNum)
+    val name = omeMetadata.getChannelName(0, channelNum) ?: "Channel $channelNum"
     val color = omeMetadata.getChannelColor(0, channelNum).let {
       if (it == null) {
         logger.warn("Channel $channelNum has no color set in OME XML metadata; picking randomly")

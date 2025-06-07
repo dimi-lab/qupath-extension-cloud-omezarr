@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OME xmlns="http://www.openmicroscopy.org/Schemas/OME/2016-06" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     Creator="OME Bio-Formats 7.0.1" UUID="urn:uuid:12345678-1234-1234-1234-123456789012"
+     xsi:schemaLocation="http://www.openmicroscopy.org/Schemas/OME/2016-06 http://www.openmicroscopy.org/Schemas/OME/2016-06/ome.xsd">
+    <Image ID="Image:0">
+        <Pixels BigEndian="true" DimensionOrder="XYZCT" ID="Pixels:0" Interleaved="false" PhysicalSizeX="0.2201"
+                PhysicalSizeXUnit="µm" PhysicalSizeY="0.2201" PhysicalSizeYUnit="µm" SignificantBits="8" SizeC="3"
+                SizeT="1" SizeX="34" SizeY="41" SizeZ="1" Type="uint8">
+            <Channel ID="Channel:0:0" SamplesPerPixel="1">
+                <LightPath/>
+            </Channel>
+            <Channel ID="Channel:0:1" Name="Channel 1 Is Present" SamplesPerPixel="1">
+                <LightPath/>
+            </Channel>
+            <Channel ID="Channel:0:2" SamplesPerPixel="1">
+                <LightPath/>
+            </Channel>
+            <MetadataOnly/>
+        </Pixels>
+    </Image>
+    <StructuredAnnotations>
+        <MapAnnotation ID="Annotation:Resolution:0" Namespace="openmicroscopy.org/PyramidResolution">
+            <Value/>
+        </MapAnnotation>
+    </StructuredAnnotations>
+</OME>
