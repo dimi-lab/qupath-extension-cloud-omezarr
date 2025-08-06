@@ -66,7 +66,7 @@ class CloudOmeZarrServer(private val zarrBaseUri: URI, vararg args: String) : Ab
 
     zarrRoot = getZarrRoot(zarrBaseUri)
     logger.info("Loading base array at $zarrRoot")
-    val rootZarr = ZarrGroup.open(zarrRoot)
+    val rootZarr = ZarrGroup.open(CloudZarrStore.fromPath(zarrRoot))
     if (rootZarr.attributes["bioformats2raw.layout"] != 3) {
       throw IOException("Expected a Zarr array with layout 3, but found ${rootZarr.attributes["bioformats2raw.layout"]}")
     }
