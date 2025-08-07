@@ -1,7 +1,12 @@
 package dimilab.qupath.ext.omezarr
 
 import com.bc.zarr.ZarrConstants.*
+import com.bc.zarr.storage.FileSystemStore
 import com.bc.zarr.storage.Store
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
+import kotlinx.coroutines.runBlocking
 import java.io.ByteArrayInputStream
 import java.io.InputStream
 import java.io.OutputStream
@@ -13,22 +18,80 @@ class CloudZarrStore(val backingStore: Store) : Store {
   companion object {
     private val logger = org.slf4j.LoggerFactory.getLogger(CloudZarrStore::class.java)
 
+    private val cachedZarrs = mutableMapOf<Path, CloudZarrStore>()
+
     fun fromPath(zarrRoot: Path): CloudZarrStore {
-      val backingStore = com.bc.zarr.storage.FileSystemStore(zarrRoot)
-      return CloudZarrStore(backingStore)
+      synchronized(cachedZarrs) {
+        val existing = cachedZarrs[zarrRoot]
+        if (existing != null) {
+          logger.debug("Using cached CloudZarrStore for path {}", zarrRoot)
+          return existing
+        }
+
+        logger.debug("Creating new CloudZarrStore for path {}", zarrRoot)
+        val backingStore = FileSystemStore(zarrRoot)
+        val zarr = CloudZarrStore(backingStore)
+        cachedZarrs[zarrRoot] = zarr
+        return zarr
+      }
     }
   }
 
   val cachedAttributes = mutableMapOf<String, ByteArray>()
+  val deferredFetches = mutableMapOf<String, Deferred<ByteArray>>()
 
   override fun getInputStream(key: String?): InputStream? {
+    if (key == null) {
+      return null
+    }
+
     if (cachedAttributes.containsKey(key)) {
       logger.debug("Cached read for key {}", key)
       return ByteArrayInputStream(cachedAttributes[key])
     }
 
-    logger.debug("Uncached read for key {}", key)
-    return backingStore.getInputStream(key)
+    val result = getOrWaitForDeferred(key)
+    return ByteArrayInputStream(result)
+  }
+
+  private fun getOrWaitForDeferred(key: String): ByteArray {
+    return runBlocking {
+      val deferredByteArray = synchronized(deferredFetches) {
+        val existing = deferredFetches[key]
+        if (existing != null) {
+          logger.debug("Waiting for existing fetch for key {}", key)
+          return@synchronized existing
+        }
+
+        logger.debug("Starting new fetch for key {}", key)
+        val deferred = makeDeferred(key)
+        deferredFetches[key] = deferred
+        deferred
+      }
+
+      deferredByteArray.await()
+    }
+  }
+
+  private fun CoroutineScope.makeDeferred(key: String): Deferred<ByteArray> = async {
+    logger.debug("Reading key {} from backing store", key)
+    backingStore.getInputStream(key).use { input ->
+      val byteArray = input.readBytes()
+
+      // Store cacheable attributes.
+      if (isAttribute(key)) {
+        synchronized(cachedAttributes) {
+          cachedAttributes[key] = byteArray
+        }
+      }
+
+      // Waiters were notified– now remove the deferred fetch
+      synchronized(deferredFetches) {
+        deferredFetches.remove(key)
+      }
+
+      byteArray
+    }
   }
 
   private val cachedExtensions = listOf(
