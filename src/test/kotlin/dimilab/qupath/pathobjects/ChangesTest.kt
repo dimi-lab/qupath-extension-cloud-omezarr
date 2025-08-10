@@ -5,16 +5,18 @@ import dimilab.qupath.pathobjects.Generator.generateChangeEvents
 import qupath.lib.geom.Point2
 import qupath.lib.io.GsonTools
 import qupath.lib.objects.PathObjects
+import qupath.lib.regions.ImagePlane
 import qupath.lib.regions.ImagePlane.getDefaultPlane
 import qupath.lib.roi.ROIs
+import qupath.lib.roi.interfaces.ROI
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
 
 class ChangesTest {
-  val plane = getDefaultPlane()
-  val roi1 = ROIs.createRectangleROI(0.0, 0.0, 100.0, 100.0, plane)
-  val roi2 = ROIs.createRectangleROI(1.0, 2.0, 100.0, 100.0, plane)
+  val plane: ImagePlane = getDefaultPlane()
+  val roi1: ROI = ROIs.createRectangleROI(0.0, 0.0, 100.0, 100.0, plane)
+  val roi2: ROI = ROIs.createRectangleROI(1.0, 2.0, 100.0, 100.0, plane)
   private val gson = GsonTools.getInstance()
 
   fun geometryToPoints(geomJson: JsonObject): List<Point2> {
@@ -39,7 +41,7 @@ class ChangesTest {
     val newJsonStr = gson.toJson(po2)
     val oldObject = gson.fromJson(oldJsonStr, JsonObject::class.java)
     val newObject = gson.fromJson(newJsonStr, JsonObject::class.java)
-    val diffs = Generator.diffPathObjects(oldObject, newObject)
+    val diffs = Generator.diffJsonObjects(oldObject, newObject)
 
     assertEquals(setOf("geometry", "properties"), diffs.keys)
     diffs["geometry"]?.asJsonObject?.let { geomJson ->
@@ -69,8 +71,8 @@ class ChangesTest {
     createdObj.name = "added_po"
 
     val oldTrackedObjects = mapOf(
-      changedObjOld.id to changedObjOld,
-      deletedObj.id to deletedObj
+      changedObjOld.id to changedObjOld.toJsonObject(),
+      deletedObj.id to deletedObj.toJsonObject()
     )
     val newTrackedObjects = mapOf(
       changedObjNew.id to changedObjNew,

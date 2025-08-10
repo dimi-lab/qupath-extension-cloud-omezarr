@@ -40,18 +40,27 @@ object Generator {
   private val logger = LoggerFactory.getLogger(Generator::class.java)
   private val gson = GsonTools.getInstance()
 
-  fun makeCreateEvent(obj: PathObject): CreateEvent {
-    val newJson = gson.toJson(obj)
+  fun makeCreateEvent(id: UUID, newJson: JsonObject): CreateEvent {
     return CreateEvent(
-      id = obj.id,
+      id = id,
       timestamp = Instant.now(),
-      fields = gson.fromJson(newJson, JsonObject::class.java)
+      fields = newJson
     )
   }
 
-  fun diffPathObjects(oldObject: JsonObject, newObject: JsonObject): Map<String, JsonElement> {
-    return newObject.entrySet().mapNotNull { (key, newValue) ->
-      val oldValue = oldObject.get(key)
+  fun makeEditEvent(id: UUID, oldJson: JsonObject, newJson: JsonObject): EditEvent {
+    val changes = diffJsonObjects(oldJson, newJson)
+
+    return EditEvent(
+      id = id,
+      timestamp = Instant.now(),
+      diff = gson.toJsonTree(changes).asJsonObject
+    )
+  }
+
+  fun diffJsonObjects(oldJson: JsonObject, newJson: JsonObject): Map<String, JsonElement> {
+    return newJson.entrySet().mapNotNull { (key, newValue) ->
+      val oldValue = oldJson.get(key)
       if (oldValue != newValue) {
         key to newValue
       } else {
@@ -60,23 +69,9 @@ object Generator {
     }.toMap()
   }
 
-  fun makeEditEvent(newObj: PathObject, oldObj: PathObject?): EditEvent {
-    val newJson = gson.fromJson(gson.toJson(newObj), JsonObject::class.java)
-
-    val changes = oldObj?.let {
-      val oldJson = gson.fromJson(gson.toJson(it), JsonObject::class.java)
-      diffPathObjects(oldJson, newJson)
-    } ?: newJson.entrySet().associate { it.key to it.value }
-
-    return EditEvent(
-      id = newObj.id,
-      timestamp = Instant.now(),
-      diff = gson.toJsonTree(changes).asJsonObject,
-    )
-  }
-
+  // Generate a list of change events for two sets of objects, in bulk.
   fun generateChangeEvents(
-    trackedObjects: Map<UUID, PathObject>,
+    trackedObjects: Map<UUID, JsonObject>,
     newObjects: Map<UUID, PathObject>,
   ): List<Event> {
     val events = mutableListOf<Event>()
@@ -98,7 +93,7 @@ object Generator {
     }
 
     // Find deleted and edited objects
-    trackedObjects.forEach { (id, oldObj) ->
+    trackedObjects.forEach { (id, oldJson) ->
       val newObject = newObjects[id]
 
       if (newObject == null) {
@@ -106,10 +101,10 @@ object Generator {
         events.add(DeleteEvent(id, now))
       } else {
         // Compare objects by converting them to JSON and comparing the trees
-        if (oldObj != newObject) {
+        if (oldJson != newObject) {
           logger.trace("Found modified object: {}", newObject.javaClass)
 
-          events.add(makeEditEvent(newObject, oldObj))
+          events.add(makeEditEvent(id, oldJson, newObject.toJsonObject()))
         }
       }
     }
