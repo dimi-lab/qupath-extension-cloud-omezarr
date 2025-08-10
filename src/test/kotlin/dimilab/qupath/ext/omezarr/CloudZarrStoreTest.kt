@@ -7,8 +7,11 @@ import io.mockk.spyk
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.Test
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertSame
+import kotlin.test.assertContentEquals
+import kotlin.test.assertTrue
 import java.io.ByteArrayInputStream
 import java.nio.file.Path
 import java.util.concurrent.CountDownLatch
@@ -154,7 +157,7 @@ class CloudZarrStoreTest {
     assertEquals(1, deferredThreadsCreated.get(), "Only one deferred thread should be created")
 
     // Verify that both threads got the same result
-    assertArrayEquals(
+    assertContentEquals(
       firstThreadResult.get(), secondThreadResult.get(),
       "Both threads should get the same content"
     )
@@ -172,17 +175,20 @@ class CloudZarrStoreTest {
       val secondThreadCompletedIndex = events.indexOf("Second thread completed")
 
       // Verify that the deferred thread completed after the second thread started
-      assert(secondThreadStartedIndex < deferredThreadCompletedIndex) {
+      assertTrue(
+        secondThreadStartedIndex < deferredThreadCompletedIndex,
         "Deferred thread should complete after the second thread starts"
-      }
+      )
 
       // Verify that both threads completed after the deferred thread completed
-      assert(deferredThreadCompletedIndex < firstThreadCompletedIndex) {
+      assertTrue(
+        deferredThreadCompletedIndex < firstThreadCompletedIndex,
         "First thread should complete after the deferred thread completes"
-      }
-      assert(deferredThreadCompletedIndex < secondThreadCompletedIndex) {
+      )
+      assertTrue(
+        deferredThreadCompletedIndex < secondThreadCompletedIndex,
         "Second thread should complete after the deferred thread completes"
-      }
+      )
     }
   }
 }
