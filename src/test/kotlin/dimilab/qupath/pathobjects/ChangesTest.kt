@@ -1,7 +1,6 @@
 package dimilab.qupath.pathobjects
 
 import com.google.gson.JsonObject
-import dimilab.qupath.pathobjects.Generator.generateChangeEvents
 import qupath.lib.geom.Point2
 import qupath.lib.io.GsonTools
 import qupath.lib.objects.PathObjects
@@ -41,7 +40,7 @@ class ChangesTest {
     val newJsonStr = gson.toJson(po2)
     val oldObject = gson.fromJson(oldJsonStr, JsonObject::class.java)
     val newObject = gson.fromJson(newJsonStr, JsonObject::class.java)
-    val diffs = Generator.diffJsonObjects(oldObject, newObject)
+    val diffs = ChangeTracker().diffJsonObjects(oldObject, newObject)
 
     assertEquals(setOf("geometry", "properties"), diffs.keys)
     diffs["geometry"]?.asJsonObject?.let { geomJson ->
@@ -70,16 +69,19 @@ class ChangesTest {
     val createdObj = PathObjects.createAnnotationObject(roi2)
     createdObj.name = "added_po"
 
-    val oldTrackedObjects = mapOf(
-      changedObjOld.id to changedObjOld.toJsonObject(),
-      deletedObj.id to deletedObj.toJsonObject()
+    val tracker = ChangeTracker()
+    tracker.trackedObjects.putAll(
+      listOf(
+        changedObjOld.id to changedObjOld.toJsonObject(),
+        deletedObj.id to deletedObj.toJsonObject()
+      )
     )
     val newTrackedObjects = mapOf(
       changedObjNew.id to changedObjNew,
       createdObj.id to createdObj
     )
 
-    val changes = generateChangeEvents(oldTrackedObjects, newTrackedObjects)
+    val changes = tracker.trackBulkChanges(newTrackedObjects)
     assertEquals(3, changes.size)
 
     val editEvent = changes.find { it.eventType == "edit" }
