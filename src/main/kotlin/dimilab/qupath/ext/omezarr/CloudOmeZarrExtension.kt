@@ -1,5 +1,6 @@
 package dimilab.qupath.ext.omezarr
 
+import dimilab.qupath.pathobjects.InstantTypeAdapter
 import javafx.beans.property.BooleanProperty
 import javafx.beans.property.Property
 import javafx.event.ActionEvent
@@ -17,8 +18,10 @@ import qupath.lib.gui.extensions.GitHubProject
 import qupath.lib.gui.extensions.GitHubProject.GitHubRepo
 import qupath.lib.gui.extensions.QuPathExtension
 import qupath.lib.gui.prefs.PathPrefs
+import qupath.lib.io.GsonTools
 import qupath.lib.io.PathIO
 import java.nio.file.Files
+import java.time.Instant
 import java.util.*
 import java.util.function.Consumer
 import java.util.function.Predicate
@@ -77,6 +80,8 @@ class CloudOmeZarrExtension : QuPathExtension, GitHubProject {
     return integerOption
   }
 
+  val annotationSyncer = AnnotationSyncer()
+
   override fun installExtension(qupath: QuPathGUI) {
     if (isInstalled) {
       logger.debug("{} is already installed", name)
@@ -85,6 +90,8 @@ class CloudOmeZarrExtension : QuPathExtension, GitHubProject {
     isInstalled = true
     addPreferenceToPane(qupath)
     addMenuItem(qupath)
+
+    qupath.viewer.addViewerListener(annotationSyncer)
   }
 
   /**
@@ -118,6 +125,11 @@ class CloudOmeZarrExtension : QuPathExtension, GitHubProject {
     refreshPathObjectsMenuItem.disableProperty().bind(enableExtensionProperty.not())
     menu.items.add(refreshPathObjectsMenuItem)
 
+    val displayChangesMenuItem = MenuItem("Show tracked changes")
+    displayChangesMenuItem.onAction = EventHandler { _: ActionEvent? -> createDisplayChangesState() }
+    displayChangesMenuItem.disableProperty().bind(enableExtensionProperty.not())
+    menu.items.add(displayChangesMenuItem)
+
     val saveToRemoteMenuItem = MenuItem("Save image data to remote")
     saveToRemoteMenuItem.onAction = EventHandler { _: ActionEvent? -> createSaveToRemoteStage() }
     saveToRemoteMenuItem.disableProperty().bind(enableExtensionProperty.not())
@@ -148,9 +160,26 @@ class CloudOmeZarrExtension : QuPathExtension, GitHubProject {
     // TODO: move this to a background thread, and add a spinner?
 
     logger.info("Refreshing remote path objects from server: $server; ${server.getImageArgs().remoteQpDataPath}")
+    annotationSyncer.paused = true
     imageData.hierarchy.clearAll()
     imageData.hierarchy.addObjects(server.readPathObjects())
+    annotationSyncer.imageDataChanged(null, null, imageData)
+    annotationSyncer.paused = false
     logger.info("Path objects refreshed")
+  }
+
+  private fun createDisplayChangesState() {
+    val dialog = Alert(
+      Alert.AlertType.INFORMATION,
+      "There are ${annotationSyncer.trackedChanges.size} unsaved changes."
+    )
+    dialog.showAndWait()
+
+    val gson = GsonTools.getDefaultBuilder()
+      .registerTypeAdapter(Instant::class.java, InstantTypeAdapter())
+      .create()
+
+    logger.info(annotationSyncer.trackedChanges.map { gson.toJson(it) }.toString())
   }
 
   private fun createSaveToRemoteStage() {
