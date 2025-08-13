@@ -2,6 +2,7 @@ package dimilab.qupath.ext.omezarr
 
 import com.bc.zarr.ZarrArray
 import com.bc.zarr.ZarrGroup
+import dimilab.qupath.quietLoggers
 import loci.formats.ome.OMEXMLMetadata
 import org.apache.commons.cli.*
 import qupath.lib.color.ColorModelFactory
@@ -255,11 +256,14 @@ class CloudOmeZarrServer(private val zarrBaseUri: URI, vararg args: String) : Ab
     logger.info("Downloaded remote path in ${System.currentTimeMillis() - startTime} ms")
     val localPath = downloads[serverArgs.remoteQpDataPath] ?: throw IOException("Failed to download remote path")
 
-    val imageData = PathIO.readImageData<BufferedImage>(localPath, null, this, null)
+    logger.debug("Opening image data from local path: $localPath")
+
+    val imageData = quietLoggers("qupath.lib.objects.MetadataMap") {
+      PathIO.readImageData<BufferedImage>(localPath, null, this, null)
+    }
+
     val objects = imageData.hierarchy.rootObject.childObjects.toMutableList()
-
-    logger.info("Image data read; extracting {} root objects", objects.size)
-
+    logger.info("Image data read; found {} objects at root", objects.size)
     return objects
   }
 
