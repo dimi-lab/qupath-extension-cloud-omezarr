@@ -134,7 +134,7 @@ class CloudOmeZarrExtension : QuPathExtension, GitHubProject {
     )
     dialog.showAndWait()
       .filter(Predicate { response: ButtonType? -> response == ButtonType.OK })
-      .ifPresent(Consumer { response: ButtonType? -> doRefreshRemotePathObjects() })
+      .ifPresent(Consumer { _: ButtonType? -> doRefreshRemotePathObjects() })
   }
 
   private fun doRefreshRemotePathObjects() {
@@ -160,7 +160,7 @@ class CloudOmeZarrExtension : QuPathExtension, GitHubProject {
     )
     dialog.showAndWait()
       .filter(Predicate { response: ButtonType? -> response == ButtonType.OK })
-      .ifPresent(Consumer { response: ButtonType? -> doSaveToRemote() })
+      .ifPresent(Consumer { _: ButtonType? -> doSaveToRemote() })
   }
 
   private fun doSaveToRemote() {

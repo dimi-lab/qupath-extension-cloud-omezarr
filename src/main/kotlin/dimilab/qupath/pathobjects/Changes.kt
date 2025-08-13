@@ -48,12 +48,12 @@ object Generator {
     )
   }
 
-  fun makeEditEvent(id: UUID, oldJson: JsonObject, newJson: JsonObject): EditEvent {
+  fun makeEditEvent(id: UUID, oldJson: JsonObject, newJson: JsonObject, now: Instant = Instant.now()): EditEvent {
     val changes = diffJsonObjects(oldJson, newJson)
 
     return EditEvent(
       id = id,
-      timestamp = Instant.now(),
+      timestamp = now,
       diff = gson.toJsonTree(changes).asJsonObject
     )
   }
@@ -75,9 +75,9 @@ object Generator {
     newObjects: Map<UUID, PathObject>,
   ): List<Event> {
     val events = mutableListOf<Event>()
-    val now = Instant.now()
+    val now = Instant.now() // don't skew "now" for grouped events
 
-    // Find added objects
+    logger.debug("Finding added objects")
     newObjects.forEach { (id, obj) ->
       if (!trackedObjects.containsKey(id)) {
         val newJson = gson.toJson(obj)
@@ -92,7 +92,8 @@ object Generator {
       }
     }
 
-    // Find deleted and edited objects
+    logger.debug("Finding deleted & changed objects")
+    // This should probably be parallelized for large hierarchies
     trackedObjects.forEach { (id, oldJson) ->
       val newObject = newObjects[id]
 
@@ -104,11 +105,12 @@ object Generator {
         if (oldJson != newObject) {
           logger.trace("Found modified object: {}", newObject.javaClass)
 
-          events.add(makeEditEvent(id, oldJson, newObject.toJsonObject()))
+          events.add(makeEditEvent(id, oldJson, newJson, now))
         }
       }
     }
 
+    logger.debug("Found ${events.size} bulk changes")
     return events
   }
 }
