@@ -1,19 +1,19 @@
-package dimilab.qupath.pathobjects
+package dimilab.qupath.pathobjects.changes
 
 import com.google.gson.JsonObject
+import dimilab.qupath.pathobjects.toJsonObject
 import qupath.lib.geom.Point2
 import qupath.lib.io.GsonTools
 import qupath.lib.objects.PathObjects
 import qupath.lib.regions.ImagePlane
-import qupath.lib.regions.ImagePlane.getDefaultPlane
 import qupath.lib.roi.ROIs
 import qupath.lib.roi.interfaces.ROI
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
 
-class ChangesTest {
-  val plane: ImagePlane = getDefaultPlane()
+class TrackerTest {
+  val plane: ImagePlane = ImagePlane.getDefaultPlane()
   val roi1: ROI = ROIs.createRectangleROI(0.0, 0.0, 100.0, 100.0, plane)
   val roi2: ROI = ROIs.createRectangleROI(1.0, 2.0, 100.0, 100.0, plane)
   private val gson = GsonTools.getInstance()
@@ -40,7 +40,7 @@ class ChangesTest {
     val newJsonStr = gson.toJson(po2)
     val oldObject = gson.fromJson(oldJsonStr, JsonObject::class.java)
     val newObject = gson.fromJson(newJsonStr, JsonObject::class.java)
-    val diffs = ChangeTracker().diffJsonObjects(oldObject, newObject)
+    val diffs = Tracker().diffJsonObjects(oldObject, newObject)
 
     assertEquals(setOf("geometry", "properties"), diffs.keys)
     diffs["geometry"]?.asJsonObject?.let { geomJson ->
@@ -69,7 +69,7 @@ class ChangesTest {
     val createdObj = PathObjects.createAnnotationObject(roi2)
     createdObj.name = "added_po"
 
-    val tracker = ChangeTracker()
+    val tracker = Tracker()
     tracker.trackedObjects.putAll(
       listOf(
         changedObjOld.id to changedObjOld.toJsonObject(),

@@ -1,7 +1,7 @@
 package dimilab.qupath.ext.omezarr
 
-import dimilab.qupath.pathobjects.ChangeTracker
-import dimilab.qupath.pathobjects.Event
+import dimilab.qupath.pathobjects.changes.Tracker
+import dimilab.qupath.pathobjects.changes.Event
 import qupath.lib.gui.viewer.QuPathViewer
 import qupath.lib.gui.viewer.QuPathViewerListener
 import qupath.lib.images.ImageData
@@ -20,7 +20,7 @@ class AnnotationSyncer : QuPathViewerListener, PathObjectHierarchyListener {
   }
 
   var trackedHierarchy: PathObjectHierarchy? = null
-  val changeTracker = ChangeTracker()
+  val changeTracker = Tracker()
   val trackedChanges = mutableListOf<Event>()
 
   var paused: Boolean = false
