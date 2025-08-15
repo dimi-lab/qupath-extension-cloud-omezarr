@@ -1,10 +1,9 @@
 package dimilab.qupath.ext.omezarr
 
-import dimilab.qupath.pathobjects.changes.TrackerTest
+import dimilab.qupath.pathobjects.Helpers.makeAnnotation
 import dimilab.qupath.pathobjects.changes.CreateEvent
 import dimilab.qupath.pathobjects.changes.DeleteEvent
 import dimilab.qupath.pathobjects.changes.EditEvent
-import qupath.lib.objects.PathObjects
 import qupath.lib.objects.hierarchy.PathObjectHierarchy
 import java.awt.image.BufferedImage
 import kotlin.test.Test
@@ -20,8 +19,7 @@ class AnnotationSyncerTest {
     val newData = qupath.lib.images.ImageData<BufferedImage>(null, hierarchy)
     syncer.imageDataChanged(null, null, newData)
 
-    val annotation = PathObjects.createAnnotationObject(TrackerTest().roi1)
-    annotation.name = "initial"
+    val annotation = makeAnnotation("initial")
     hierarchy.addObject(annotation)
 
     annotation.name = "second"
