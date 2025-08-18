@@ -1,6 +1,6 @@
-package dimilab.qupath.ext.omezarr
+package dimilab.omezarr
 
-import dimilab.qupath.ext.omezarr.OmeXmlUtils.Companion.logger
+import dimilab.omezarr.OmeXmlUtils.Companion.logger
 import loci.common.services.ServiceFactory
 import loci.common.xml.XMLTools
 import loci.formats.ome.OMEXMLMetadata
@@ -8,6 +8,7 @@ import loci.formats.services.OMEXMLService
 import ome.xml.model.enums.PixelType
 import ome.xml.model.primitives.Color
 import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.xml.sax.SAXException
 import qupath.lib.common.ColorTools
 import qupath.lib.images.servers.ImageChannel
@@ -22,7 +23,7 @@ import kotlin.random.Random
 
 class OmeXmlUtils {
   companion object {
-    val logger: Logger = org.slf4j.LoggerFactory.getLogger(OmeZarrUtils::class.java)
+    val logger: Logger = LoggerFactory.getLogger(OmeXmlUtils::class.java)
   }
 }
 

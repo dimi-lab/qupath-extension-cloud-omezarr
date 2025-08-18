@@ -1,4 +1,4 @@
-package dimilab.qupath.ext.omezarr
+package dimilab.omezarr
 
 import com.bc.zarr.storage.Store
 import io.mockk.every

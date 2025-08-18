@@ -1,13 +1,15 @@
-package dimilab.qupath.ext.omezarr
+package dimilab.omezarr
 
+import com.bc.zarr.DataType
 import com.bc.zarr.ZarrArray
 import com.google.cloud.storage.BlobId
 import com.google.cloud.storage.StorageOptions
 import com.google.cloud.storage.contrib.nio.CloudStorageConfiguration
 import com.google.cloud.storage.contrib.nio.CloudStorageFileSystem
-import dimilab.qupath.ext.omezarr.OmeZarrUtils.Companion.logger
+import dimilab.omezarr.OmeZarrUtils.Companion.logger
 import kotlinx.coroutines.*
 import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import qupath.lib.images.servers.PixelType
 import java.awt.image.*
 import java.net.URI
@@ -19,27 +21,27 @@ import ome.xml.model.enums.PixelType as OmePixelType
 
 class OmeZarrUtils {
   companion object {
-    val logger: Logger = org.slf4j.LoggerFactory.getLogger(OmeZarrUtils::class.java)
+    val logger: Logger = LoggerFactory.getLogger(OmeZarrUtils::class.java)
   }
 }
 
-fun omeXmlPixelTypeToZarrDtype(omeXmlPixelType: OmePixelType): com.bc.zarr.DataType {
+fun omeXmlPixelTypeToZarrDtype(omeXmlPixelType: OmePixelType): DataType {
   return when (omeXmlPixelType) {
-    OmePixelType.INT8 -> com.bc.zarr.DataType.i1
-    OmePixelType.UINT8 -> com.bc.zarr.DataType.u1
-    OmePixelType.INT16 -> com.bc.zarr.DataType.i2
-    OmePixelType.UINT16 -> com.bc.zarr.DataType.u2
-    OmePixelType.INT32 -> com.bc.zarr.DataType.i4
-    OmePixelType.UINT32 -> com.bc.zarr.DataType.u4
-    OmePixelType.FLOAT -> com.bc.zarr.DataType.f4
-    OmePixelType.DOUBLE -> com.bc.zarr.DataType.f8
+    OmePixelType.INT8 -> DataType.i1
+    OmePixelType.UINT8 -> DataType.u1
+    OmePixelType.INT16 -> DataType.i2
+    OmePixelType.UINT16 -> DataType.u2
+    OmePixelType.INT32 -> DataType.i4
+    OmePixelType.UINT32 -> DataType.u4
+    OmePixelType.FLOAT -> DataType.f4
+    OmePixelType.DOUBLE -> DataType.f8
     else -> throw IllegalArgumentException("Unsupported pixel type: $omeXmlPixelType")
   }
 }
 
 fun checkPixelType(
   omePixelType: OmePixelType,
-  scaleLevels: List<CloudOmeZarrServer.ScaleLevel>,
+  scaleLevels: List<ScaleLevel>,
 ) {
   // This checks that the OME metadata and zarr were generated together correctly.
 
@@ -157,7 +159,12 @@ fun getZarrRoot(uri: URI): Path {
   val zarrFs = try {
     uriToFileSystem(uri)
   } catch (e: ProviderNotFoundException) {
-    logger.error("No java.nio FileSystemProvider found for scheme '{}', uri: {}", uri.scheme, uri, e)
+    logger.error(
+      "No java.nio FileSystemProvider found for scheme '{}', uri: {}",
+      uri.scheme,
+      uri,
+      e
+    )
     throw IllegalArgumentException("Unsupported scheme '${uri.scheme}'")
   }
 
@@ -170,3 +177,13 @@ fun getZarrRoot(uri: URI): Path {
 
   return zarrFs.getPath(uri.path)
 }
+
+data class ScaleLevel(
+  val path: String,
+  val width: Int,
+  val height: Int,
+  val tileWidth: Int,
+  val tileHeight: Int,
+  val zarrArray: ZarrArray,
+  // TODO: coordinateTransforms
+)

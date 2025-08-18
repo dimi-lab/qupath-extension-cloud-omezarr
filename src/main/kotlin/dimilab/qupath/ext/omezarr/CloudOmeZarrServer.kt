@@ -1,7 +1,14 @@
 package dimilab.qupath.ext.omezarr
 
-import com.bc.zarr.ZarrArray
 import com.bc.zarr.ZarrGroup
+import dimilab.omezarr.CloudZarrStore
+import dimilab.omezarr.ScaleLevel
+import dimilab.omezarr.checkPixelType
+import dimilab.omezarr.getZarrRoot
+import dimilab.omezarr.omeChannelsToQuPath
+import dimilab.omezarr.omeXmlPixelTypeToQupath
+import dimilab.omezarr.parseOmeXmlMetadata
+import dimilab.omezarr.renderZarrToBufferedImage
 import dimilab.qupath.quietLoggers
 import loci.formats.ome.OMEXMLMetadata
 import org.apache.commons.cli.*
@@ -43,16 +50,6 @@ class CloudOmeZarrServer(private val zarrBaseUri: URI, vararg args: String) : Ab
   private val metadata: ImageServerMetadata
   private val originalArgs = arrayOf(*args)
   private val serverArgs: OmeZarrArgs
-
-  data class ScaleLevel(
-    val path: String,
-    val width: Int,
-    val height: Int,
-    val tileWidth: Int,
-    val tileHeight: Int,
-    val zarrArray: ZarrArray,
-    // TODO: coordinateTransforms
-  )
 
   // The image has several levels of detail.
   private val scaleLevels: List<ScaleLevel>
