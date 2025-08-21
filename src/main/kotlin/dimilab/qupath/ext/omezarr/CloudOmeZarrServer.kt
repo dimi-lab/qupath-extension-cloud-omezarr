@@ -39,7 +39,8 @@ class CloudOmeZarrServer(private val zarrBaseUri: URI, vararg args: String) : Ab
   private val zarrRoot: Path
 
   data class OmeZarrArgs(
-    val remoteQpDataPath: URI?,
+    val remoteQpDataPath: URI? = null,
+    val changesetRoot: URI? = null,
   )
 
   data class OmeZarrMetadata(
@@ -49,7 +50,7 @@ class CloudOmeZarrServer(private val zarrBaseUri: URI, vararg args: String) : Ab
 
   private val metadata: ImageServerMetadata
   private val originalArgs = arrayOf(*args)
-  private val serverArgs: OmeZarrArgs
+  val serverArgs: OmeZarrArgs
 
   // The image has several levels of detail.
   private val scaleLevels: List<ScaleLevel>
@@ -111,6 +112,12 @@ class CloudOmeZarrServer(private val zarrBaseUri: URI, vararg args: String) : Ab
       .desc("set the remote QuPath qpdata path")
       .build()
     options.addOption(remoteFileOption)
+    val changesetRootOption = Option.builder().longOpt("changeset-root")
+      .argName("changeset-root")
+      .hasArg()
+      .desc("set the remote changeset root path, gs://bucket/path")
+      .build()
+    options.addOption(changesetRootOption)
 
     val parser: CommandLineParser = DefaultParser()
     val line: CommandLine? = parser.parse(options, args)
@@ -121,8 +128,15 @@ class CloudOmeZarrServer(private val zarrBaseUri: URI, vararg args: String) : Ab
       null
     }
 
+    val changesetRootUri = if (line?.hasOption("changeset-root") == true) {
+      URI.create(line.getOptionValue("changeset-root"))
+    } else {
+      null
+    }
+
     return OmeZarrArgs(
       remoteQpDataPath = remoteQpDataUri,
+      changesetRoot = changesetRootUri,
     )
   }
 
