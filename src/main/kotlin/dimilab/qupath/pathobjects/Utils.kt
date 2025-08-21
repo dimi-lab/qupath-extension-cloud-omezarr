@@ -1,26 +1,30 @@
 package dimilab.qupath.pathobjects
 
+import com.google.gson.JsonObject
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
 import dimilab.qupath.pathobjects.Utils.Companion.logger
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import qupath.lib.common.ColorTools
+import qupath.lib.io.GsonTools
 import qupath.lib.objects.PathObject
 import java.time.Instant
 
 class Utils {
   companion object {
-    val logger = org.slf4j.LoggerFactory.getLogger(Utils::class.java)
+    val logger: Logger = LoggerFactory.getLogger(Utils::class.java)
   }
 }
 
 
-fun PathObject.toJsonObject(): com.google.gson.JsonObject {
+fun PathObject.toJsonObject(): JsonObject {
   // Is this truly the best way: going from object to string then parsed to JSON object?
-  val gson = qupath.lib.io.GsonTools.getInstance()
+  val gson = GsonTools.getInstance()
   val jsonStr = gson.toJson(this)
-  return gson.fromJson(jsonStr, com.google.gson.JsonObject::class.java)
+  return gson.fromJson(jsonStr, JsonObject::class.java)
 }
 
 class InstantTypeAdapter : TypeAdapter<Instant>() {
