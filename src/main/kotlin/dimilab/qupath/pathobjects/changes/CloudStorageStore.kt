@@ -37,7 +37,11 @@ class CloudStorageStore {
   private val writeQueue = mutableListOf<Event>()
 
   private val lastSeenChangesetLock = ReentrantLock()
-  private var lastSeenChangesetId = 0
+  var lastSeenChangesetId = 0
+    private set (value) {
+      logger.debug("Updating last seen changeset ID from {} to {}", field, value)
+      field = value
+    }
 
   constructor(
     rootUri: URI,
@@ -64,7 +68,7 @@ class CloudStorageStore {
         logger.info("Sync already in progress, waiting for completion")
         currentSync!!
       } else {
-        logger.info("Launching new sync")
+        logger.info("Launching new sync for store: {}", changesetRoot().gsUri)
         CoroutineScope(ioDispatcher).async {
           try {
             syncThreadMain()

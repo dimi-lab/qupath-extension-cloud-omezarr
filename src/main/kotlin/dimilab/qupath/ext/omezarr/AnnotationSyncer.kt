@@ -1,7 +1,6 @@
 package dimilab.qupath.ext.omezarr
 
-import dimilab.qupath.pathobjects.changes.Tracker
-import dimilab.qupath.pathobjects.changes.Event
+import dimilab.qupath.pathobjects.changes.*
 import qupath.lib.gui.viewer.QuPathViewer
 import qupath.lib.gui.viewer.QuPathViewerListener
 import qupath.lib.images.ImageData
@@ -14,30 +13,71 @@ import java.awt.Shape
 import java.awt.image.BufferedImage
 
 // This bridges qupath hierarchy events into our change tracking.
-class AnnotationSyncer : QuPathViewerListener, PathObjectHierarchyListener {
+class AnnotationSyncer : QuPathViewerListener, PathObjectHierarchyListener, StoreListener {
   companion object {
     private val logger = org.slf4j.LoggerFactory.getLogger(AnnotationSyncer::class.java)
   }
 
+  var remoteStore: CloudStorageStore? = null
   var trackedHierarchy: PathObjectHierarchy? = null
   val changeTracker = Tracker()
   val trackedChanges = mutableListOf<Event>()
 
+  // If true, ignore incoming hierarchy changes.
   var paused: Boolean = false
 
+  // Called by QuPath when a viewer's image data changes.
   override fun imageDataChanged(
     viewer: QuPathViewer?,
     imageDataOld: ImageData<BufferedImage>?,
     imageDataNew: ImageData<BufferedImage>?,
   ) {
-    logger.info("imageDataChanged: retracking hierarchy")
+    logger.info("imageDataChanged: tracking new imageData {}", imageDataNew?.server?.metadata?.getName() ?: "<unknown>")
     trackedHierarchy?.removeListener(this)
-    trackedHierarchy = imageDataNew?.hierarchy.also {
-      changeTracker.retrack(it)
-      it?.addListener(this)
+    trackedHierarchy = null
+
+    if (remoteStore != null) {
+      logger.info("Disconnecting from remote store at: {}", remoteStore?.changesetRoot()?.gsUri)
+      remoteStore?.removeListener(this)
+      remoteStore = null
+    }
+
+    trackedHierarchy = imageDataNew?.hierarchy
+    if (trackedHierarchy == null) {
+      changeTracker.trackedObjects.clear()
+    } else {
+      changeTracker.retrack(trackedHierarchy)
+    }
+    trackedHierarchy?.addListener(this)
+
+    val server = imageDataNew?.server
+    if (server is CloudOmeZarrServer && server.serverArgs.changesetRoot != null) {
+      logger.info("Connecting to remote changeset store at: {}", server.serverArgs.changesetRoot)
+      remoteStore = CloudStorageStore(server.serverArgs.changesetRoot).also {
+        it.addListener(this)
+        it.syncEvents(blocking = false)
+      }
+    } else {
+      logger.info("Not connecting image without changeset root: ${imageDataNew?.server?.javaClass?.name}")
     }
   }
 
+  // Called by the CloudStorageStore when it receives new events.
+  override fun onNewEvents(events: List<Event>) {
+    val trackedHierarchy = this.trackedHierarchy ?: return
+
+    logger.info("Received {} new events from remote store", events.size)
+
+    val oldPaused = this.paused
+    this.paused = true
+    Applier.applyEventsToHierarchy(events, trackedHierarchy)
+    this.paused = oldPaused
+    changeTracker.retrackObjects(events.map { it.id }.toSet(), trackedHierarchy)
+
+    logger.info("Annotation syncer now at changeset ${remoteStore?.lastSeenChangesetId}")
+  }
+
+  // Called by QuPath when an image's object hierarchy changes.
   override fun hierarchyChanged(event: PathObjectHierarchyEvent?) {
     if (paused) return
     if (event == null) return
@@ -57,13 +97,16 @@ class AnnotationSyncer : QuPathViewerListener, PathObjectHierarchyListener {
       HierarchyEventType.ADDED, HierarchyEventType.CHANGE_MEASUREMENTS, HierarchyEventType.CHANGE_CLASSIFICATION, HierarchyEventType.CHANGE_OTHER -> {
         changeTracker.trackObjectChanges(event.changedObjects)
       }
+
       HierarchyEventType.REMOVED -> {
         changeTracker.trackObjectDeletions(event.changedObjects)
       }
+
       HierarchyEventType.OTHER_STRUCTURE_CHANGE -> {
         val newObjects = event.hierarchy.getAllObjects(false).associateBy { it.id }
         changeTracker.trackBulkChanges(newObjects)
       }
+
       else -> {
         logger.error("Don't know how to handle hierarchy change event: ${event.eventType}")
         listOf()
@@ -79,6 +122,7 @@ class AnnotationSyncer : QuPathViewerListener, PathObjectHierarchyListener {
       }
 
     trackedChanges.addAll(changeEvents)
+    remoteStore?.storeEvents(changeEvents)
   }
 
   override fun visibleRegionChanged(viewer: QuPathViewer?, shape: Shape?) {
