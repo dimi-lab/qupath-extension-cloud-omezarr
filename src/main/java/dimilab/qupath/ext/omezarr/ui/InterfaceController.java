@@ -1,10 +1,10 @@
 package dimilab.qupath.ext.omezarr.ui;
 
+import dimilab.qupath.ext.omezarr.CloudOmeZarrExtension;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Spinner;
 import javafx.scene.layout.VBox;
-import dimilab.qupath.ext.omezarr.CloudOmeZarrExtension;
 import qupath.fx.dialogs.Dialogs;
 
 import java.io.IOException;
@@ -21,6 +21,7 @@ public class InterfaceController extends VBox {
 
     /**
      * Create a new instance of the interface controller.
+     *
      * @return a new instance of the interface controller
      * @throws IOException If reading the extension FXML files fails.
      */
@@ -34,6 +35,7 @@ public class InterfaceController extends VBox {
      * Fields in this class tagged with <code>@FXML</code> correspond to UI elements, and methods tagged with <code>@FXML</code> are methods triggered by actions on the UI (e.g., mouse clicks).
      * <p>
      * We consider the use of FXML to be "best practice" for UI creation, as it separates logic from layout and enables easier use of CSS. However, it is not mandatory, and you could instead define the layout of the UI using code.
+     *
      * @throws IOException If the FXML can't be read successfully.
      */
     private InterfaceController() throws IOException {

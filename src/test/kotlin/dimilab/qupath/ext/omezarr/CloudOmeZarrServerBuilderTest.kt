@@ -1,17 +1,7 @@
 package dimilab.qupath.ext.omezarr
 
-import com.google.cloud.storage.BlobId
-import com.google.cloud.storage.BlobInfo
-import com.google.cloud.storage.StorageOptions
-import com.google.cloud.storage.contrib.nio.testing.LocalStorageHelper
-import io.mockk.every
-import io.mockk.mockkStatic
 import java.io.File
 import java.net.URI
-import java.nio.file.Files
-import kotlin.io.path.isDirectory
-import kotlin.io.path.relativeTo
-import kotlin.io.path.toPath
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull

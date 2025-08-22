@@ -7,7 +7,6 @@ import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.asCoroutineDispatcher
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -269,7 +268,8 @@ class CloudStorageStoreTest {
     val createdNames = created.filter { it.startsWith(prefix) }
     assertEquals(1, createdNames.size)
     assertTrue(createdNames[0].endsWith("events_0000000002.jsonl"), "Write after sync should use next index")
-    val storedObjects = objects[createdNames[0]]!!.toString(StandardCharsets.UTF_8).trim().lines().map { Event.gson.fromJson(it, Event::class.java) }
+    val storedObjects = objects[createdNames[0]]!!.toString(StandardCharsets.UTF_8).trim().lines()
+      .map { Event.gson.fromJson(it, Event::class.java) }
     assertEquals(listOf(e1), storedObjects)
   }
 }

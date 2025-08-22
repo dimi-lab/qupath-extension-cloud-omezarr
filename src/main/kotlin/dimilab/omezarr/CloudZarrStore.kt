@@ -12,7 +12,7 @@ import java.io.ByteArrayInputStream
 import java.io.InputStream
 import java.io.OutputStream
 import java.nio.file.Path
-import java.util.TreeSet
+import java.util.*
 import java.util.stream.Stream
 
 class CloudZarrStore(val backingStore: Store) : Store {

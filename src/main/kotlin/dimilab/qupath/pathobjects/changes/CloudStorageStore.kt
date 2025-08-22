@@ -38,7 +38,7 @@ class CloudStorageStore {
 
   private val lastSeenChangesetLock = ReentrantLock()
   var lastSeenChangesetId = 0
-    private set (value) {
+    private set(value) {
       logger.debug("Updating last seen changeset ID from {} to {}", field, value)
       field = value
     }
