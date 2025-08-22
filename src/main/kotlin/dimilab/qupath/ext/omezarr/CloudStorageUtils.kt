@@ -95,3 +95,9 @@ fun URI.toBlobId(): BlobId {
 fun String.toBlobId(): BlobId {
   return BlobId.fromGsUtilUri(this)
 }
+
+inline val BlobInfo.gsUri: String
+  get() = this.blobId.toGsUtilUri()
+
+inline val BlobId.gsUri: String
+  get() = this.toGsUtilUri()
