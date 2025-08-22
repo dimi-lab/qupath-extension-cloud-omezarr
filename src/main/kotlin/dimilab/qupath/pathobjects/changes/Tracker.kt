@@ -36,6 +36,25 @@ class Tracker {
     logger.info("Now tracking ${trackedObjects.size} objects; hierarchy root is: ${newHierarchy.rootObject.id}")
   }
 
+  fun retrackObjects(objectIds: Collection<UUID>, hierarchy: PathObjectHierarchy) {
+    val hierarchyObjects = hierarchy.getAllObjects(false).associateBy { it.id }
+
+    objectIds.forEach { id ->
+      if (!hierarchyObjects.containsKey(id)) {
+        trackedObjects.remove(id)
+      } else {
+        val pathObject = hierarchyObjects[id]!!
+        // We don't track detection object changes, so don't track anything beyond existence
+        if (pathObject is PathDetectionObject) {
+          trackedObjects[id] = JsonObject() // just so we know it's there
+        } else {
+          trackedObjects[id] = pathObject.toJsonObject()
+        }
+      }
+    }
+
+  }
+
   private fun makeCreateEvent(id: UUID, newJson: JsonObject): CreateEvent {
     return CreateEvent(
       id = id,
