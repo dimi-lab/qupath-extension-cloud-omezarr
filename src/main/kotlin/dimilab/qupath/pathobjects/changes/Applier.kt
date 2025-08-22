@@ -156,6 +156,10 @@ object Applier {
             }
           }
 
+          "objectType" -> {
+            /* ignore; shows up in non-granular property diffs */
+          }
+
           else -> {
             logger.warn("Unknown property change: $key")
           }

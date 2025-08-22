@@ -1,6 +1,5 @@
 package dimilab.qupath.ext.omezarr
 
-import dimilab.qupath.pathobjects.InstantTypeAdapter
 import javafx.beans.property.BooleanProperty
 import javafx.beans.property.Property
 import javafx.event.ActionEvent
@@ -18,10 +17,8 @@ import qupath.lib.gui.extensions.GitHubProject
 import qupath.lib.gui.extensions.GitHubProject.GitHubRepo
 import qupath.lib.gui.extensions.QuPathExtension
 import qupath.lib.gui.prefs.PathPrefs
-import qupath.lib.io.GsonTools
 import qupath.lib.io.PathIO
 import java.nio.file.Files
-import java.time.Instant
 import java.util.*
 import java.util.function.Consumer
 import java.util.function.Predicate
@@ -120,26 +117,41 @@ class CloudOmeZarrExtension : QuPathExtension, GitHubProject {
   private fun addMenuItem(qupath: QuPathGUI) {
     val menu = qupath.getMenu("Extensions>$EXTENSION_NAME", true)
 
-    val refreshPathObjectsMenuItem = MenuItem("Refresh remote PathObjects")
-    refreshPathObjectsMenuItem.onAction = EventHandler { _: ActionEvent? -> createRefreshRemotePathObjectsStage() }
+    val syncTrackedChangesMenuItem = MenuItem("Load remote tracked changes")
+    syncTrackedChangesMenuItem.onAction = EventHandler { _: ActionEvent? -> doSyncTrackedChanges() }
+    syncTrackedChangesMenuItem.disableProperty().bind(enableExtensionProperty.not())
+    menu.items.add(syncTrackedChangesMenuItem)
+
+    val refreshPathObjectsMenuItem = MenuItem("Reset from primary data")
+    refreshPathObjectsMenuItem.onAction = EventHandler { _: ActionEvent? -> createResetFromRemoteStage() }
     refreshPathObjectsMenuItem.disableProperty().bind(enableExtensionProperty.not())
     menu.items.add(refreshPathObjectsMenuItem)
 
-    val displayChangesMenuItem = MenuItem("Show tracked changes")
-    displayChangesMenuItem.onAction = EventHandler { _: ActionEvent? -> createDisplayChangesState() }
-    displayChangesMenuItem.disableProperty().bind(enableExtensionProperty.not())
-    menu.items.add(displayChangesMenuItem)
-
-    val saveToRemoteMenuItem = MenuItem("Save image data to remote")
-    saveToRemoteMenuItem.onAction = EventHandler { _: ActionEvent? -> createSaveToRemoteStage() }
+    val saveToRemoteMenuItem = MenuItem("Overwrite remote primary data")
+    saveToRemoteMenuItem.onAction = EventHandler { _: ActionEvent? -> createOverwriteRemote() }
     saveToRemoteMenuItem.disableProperty().bind(enableExtensionProperty.not())
     menu.items.add(saveToRemoteMenuItem)
+  }
+
+  private fun doSyncTrackedChanges() {
+    val imageData = QuPathGUI.getInstance().imageData
+    val server = imageData.server
+    if (server !is CloudOmeZarrServer) {
+      logger.warn("Image server is not a CloudOmeZarrServer")
+      return
+    }
+    if (annotationSyncer.remoteStore == null) {
+      logger.error("Remote store is not set up")
+      return
+    }
+    logger.info("Syncing tracked changes from remote store: ${annotationSyncer.remoteStore?.changesetRoot()?.gsUri}")
+    annotationSyncer.remoteStore?.syncEvents(false)
   }
 
   /**
    * Demo showing how to create a new stage with a JavaFX FXML interface.
    */
-  private fun createRefreshRemotePathObjectsStage() {
+  private fun createResetFromRemoteStage() {
     val dialog = Alert(
       Alert.AlertType.CONFIRMATION,
       "Delete all local path objects and refresh from server?"
@@ -166,26 +178,13 @@ class CloudOmeZarrExtension : QuPathExtension, GitHubProject {
     annotationSyncer.imageDataChanged(null, null, imageData)
     annotationSyncer.paused = false
     logger.info("Path objects refreshed")
+    doSyncTrackedChanges()
   }
 
-  private fun createDisplayChangesState() {
-    val dialog = Alert(
-      Alert.AlertType.INFORMATION,
-      "There are ${annotationSyncer.trackedChanges.size} unsaved changes."
-    )
-    dialog.showAndWait()
-
-    val gson = GsonTools.getDefaultBuilder()
-      .registerTypeAdapter(Instant::class.java, InstantTypeAdapter())
-      .create()
-
-    logger.info(annotationSyncer.trackedChanges.map { gson.toJson(it) }.toString())
-  }
-
-  private fun createSaveToRemoteStage() {
+  private fun createOverwriteRemote() {
     val dialog = Alert(
       Alert.AlertType.CONFIRMATION,
-      "Save image data to remote storage?"
+      "Overwrite shared primary copy with local data?"
     )
     dialog.showAndWait()
       .filter(Predicate { response: ButtonType? -> response == ButtonType.OK })

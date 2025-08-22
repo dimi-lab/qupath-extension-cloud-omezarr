@@ -1,12 +1,13 @@
-package dimilab.qupath.ext.omezarr
+package dimilab.omezarr
 
-import com.bc.zarr.ZarrConstants.*
+import com.bc.zarr.ZarrConstants
 import com.bc.zarr.storage.FileSystemStore
 import com.bc.zarr.storage.Store
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
+import org.slf4j.LoggerFactory
 import java.io.ByteArrayInputStream
 import java.io.InputStream
 import java.io.OutputStream
@@ -16,7 +17,7 @@ import java.util.stream.Stream
 
 class CloudZarrStore(val backingStore: Store) : Store {
   companion object {
-    private val logger = org.slf4j.LoggerFactory.getLogger(CloudZarrStore::class.java)
+    private val logger = LoggerFactory.getLogger(CloudZarrStore::class.java)
 
     private val cachedZarrs = mutableMapOf<Path, CloudZarrStore>()
 
@@ -95,9 +96,9 @@ class CloudZarrStore(val backingStore: Store) : Store {
   }
 
   private val cachedExtensions = listOf(
-    FILENAME_DOT_ZATTRS,
-    FILENAME_DOT_ZARRAY,
-    FILENAME_DOT_ZGROUP,
+    ZarrConstants.FILENAME_DOT_ZATTRS,
+    ZarrConstants.FILENAME_DOT_ZARRAY,
+    ZarrConstants.FILENAME_DOT_ZGROUP,
   )
 
   private fun isAttribute(key: String?): Boolean {

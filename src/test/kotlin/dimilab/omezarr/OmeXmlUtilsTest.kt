@@ -1,15 +1,16 @@
-package dimilab.qupath.ext.omezarr
+package dimilab.omezarr
 
 import kotlin.io.path.toPath
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class OmeXmlUtilsTest {
-  private val testZarrRootUri = CloudOmeZarrServer::class.java.classLoader.getResource("test.zarr/")?.toURI()
+  private val testZarrRootUri = OmeXmlUtilsTest::class.java.classLoader.getResource("test.zarr/")?.toURI()
     ?: throw IllegalStateException("Could not find test.zarr")
 
-  private val testOmeMetadataRootUri = CloudOmeZarrServer::class.java.classLoader.getResource("test-ome-metadata/")?.toURI()
-    ?: throw IllegalStateException("Could not find test-ome-metadata")
+  private val testOmeMetadataRootUri =
+    OmeXmlUtilsTest::class.java.classLoader.getResource("test-ome-metadata/")?.toURI()
+      ?: throw IllegalStateException("Could not find test-ome-metadata")
 
   @Test
   fun testOmeChannelsToQuPath() {

@@ -1,4 +1,4 @@
-package dimilab.qupath.ext.omezarr
+package dimilab.omezarr
 
 import com.google.cloud.storage.contrib.nio.CloudStorageFileSystem
 import java.net.URI
@@ -39,7 +39,7 @@ class OmeZarrUtilsTest {
   @Test
   fun getZarrRoot_unsupported() {
     val uri = URI.create("s3://a-bucket/folder/animage.zarr/")
-    val exception = kotlin.runCatching { getZarrRoot(uri) }.exceptionOrNull()
+    val exception = runCatching { getZarrRoot(uri) }.exceptionOrNull()
     assertIs<IllegalArgumentException>(exception)
     assertEquals("Unsupported scheme 's3'", exception?.message)
   }

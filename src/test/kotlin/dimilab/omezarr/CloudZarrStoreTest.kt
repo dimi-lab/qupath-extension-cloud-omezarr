@@ -1,4 +1,4 @@
-package dimilab.qupath.ext.omezarr
+package dimilab.omezarr
 
 import com.bc.zarr.storage.Store
 import io.mockk.every
@@ -7,11 +7,6 @@ import io.mockk.spyk
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertSame
-import kotlin.test.assertContentEquals
-import kotlin.test.assertTrue
 import java.io.ByteArrayInputStream
 import java.nio.file.Path
 import java.util.concurrent.CountDownLatch
@@ -19,6 +14,7 @@ import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
+import kotlin.test.*
 
 class CloudZarrStoreTest {
 
