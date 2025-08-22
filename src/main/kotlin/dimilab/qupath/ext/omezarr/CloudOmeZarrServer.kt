@@ -3,6 +3,10 @@ package dimilab.qupath.ext.omezarr
 import com.bc.zarr.ZarrGroup
 import dimilab.omezarr.*
 import dimilab.qupath.quietLoggers
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.runBlocking
 import loci.formats.ome.OMEXMLMetadata
 import org.apache.commons.cli.*
 import qupath.lib.color.ColorModelFactory
@@ -176,20 +180,26 @@ class CloudOmeZarrServer(private val zarrBaseUri: URI, vararg args: String) : Ab
     val xDimension = 4
     val yDimension = 3
 
-    return scaleLevelDefs.map {
-      val scaleLevelDef = it as Map<*, *>
-      val path = scaleLevelDef["path"] as String
+    return runBlocking(Dispatchers.IO) {
+      val workers = scaleLevelDefs.map {
+        async {
+          val scaleLevelDef = it as Map<*, *>
+          val path = scaleLevelDef["path"] as String
 
-      val scaledArray = imageZarr.openArray(path)
+          val scaledArray = imageZarr.openArray(path)
 
-      ScaleLevel(
-        path = path,
-        width = scaledArray.shape[xDimension],
-        height = scaledArray.shape[yDimension],
-        tileWidth = scaledArray.chunks[xDimension],
-        tileHeight = scaledArray.chunks[yDimension],
-        zarrArray = scaledArray,
-      )
+          ScaleLevel(
+            path = path,
+            width = scaledArray.shape[xDimension],
+            height = scaledArray.shape[yDimension],
+            tileWidth = scaledArray.chunks[xDimension],
+            tileHeight = scaledArray.chunks[yDimension],
+            zarrArray = scaledArray,
+          )
+        }
+      }
+
+      workers.awaitAll()
     }
   }
 
