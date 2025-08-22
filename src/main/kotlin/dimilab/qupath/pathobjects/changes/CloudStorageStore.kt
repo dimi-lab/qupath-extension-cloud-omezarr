@@ -18,6 +18,7 @@ import kotlin.math.max
 
 interface StoreListener {
   fun onNewEvents(events: List<Event>)
+  fun onNewChangesetId(changesetId: Int)
 }
 
 class CloudStorageStore {
@@ -37,29 +38,33 @@ class CloudStorageStore {
   private val writeQueue = mutableListOf<Event>()
 
   private val lastSeenChangesetLock = ReentrantLock()
-  var lastSeenChangesetId = 0
+  var lastSeenChangesetId: Int = 0
     private set(value) {
       logger.debug("Updating last seen changeset ID from {} to {}", field, value)
       field = value
+      listeners.forEach { it.onNewChangesetId(value) }
     }
 
   constructor(
     rootUri: URI,
     storage: Storage = StorageOptions.getDefaultInstance().service,
     ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
+    lastSeenChangesetId: Int = 0,
   ) : this(
-    rootUri.toBlobId(), storage, ioDispatcher
+    rootUri.toBlobId(), storage, ioDispatcher, lastSeenChangesetId
   )
 
   constructor(
     rootBlobId: BlobId,
     storage: Storage = StorageOptions.getDefaultInstance().service,
     ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
+    lastSeenChangesetId: Int = 0,
   ) {
     this.gcsService = storage
     this.bucket = rootBlobId.bucket
     this.prefix = ensureDirPrefix(rootBlobId.name)
     this.ioDispatcher = ioDispatcher
+    this.lastSeenChangesetId = lastSeenChangesetId
   }
 
   fun syncEvents(blocking: Boolean) {
