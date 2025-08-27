@@ -1,5 +1,6 @@
 package dimilab.qupath.ext.omezarr
 
+import dimilab.qupath.ext.omezarr.AnnotationSyncer.Companion.LAST_CHANGESET_ID
 import javafx.beans.property.BooleanProperty
 import javafx.beans.property.Property
 import javafx.event.ActionEvent
@@ -175,6 +176,7 @@ class CloudOmeZarrExtension : QuPathExtension, GitHubProject {
     annotationSyncer.paused = true
     imageData.hierarchy.clearAll()
     imageData.hierarchy.addObjects(server.readPathObjects())
+    imageData.setProperty(LAST_CHANGESET_ID, 0)
     annotationSyncer.imageDataChanged(null, null, imageData)
     annotationSyncer.paused = false
     logger.info("Path objects refreshed")
