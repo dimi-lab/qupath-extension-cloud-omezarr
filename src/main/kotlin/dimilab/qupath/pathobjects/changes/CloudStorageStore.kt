@@ -11,6 +11,7 @@ import kotlinx.coroutines.*
 import org.slf4j.LoggerFactory
 import java.net.URI
 import java.nio.charset.StandardCharsets
+import java.util.SortedMap
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
@@ -234,14 +235,14 @@ class CloudStorageStore {
     return blobs
   }
 
-  private fun readChangesets(changesets: Map<Int, BlobId>): Map<Int, Sequence<Event>> {
+  private fun readChangesets(changesets: Map<Int, BlobId>): SortedMap<Int, Sequence<Event>> {
     val loadedEvents = changesets.mapValues { (idx, changeset) ->
       logger.debug("Loading changeset {} from {}", idx, changeset.gsUri)
       val jsonl = gcsService.readAllBytes(changeset).toString(StandardCharsets.UTF_8)
       jsonl.lineSequence().mapNotNull { line ->
         gson.fromJson(line, Event::class.java)
       }
-    }
+    }.toSortedMap()
 
     return loadedEvents
   }
