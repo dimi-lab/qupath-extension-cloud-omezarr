@@ -123,12 +123,12 @@ class CloudOmeZarrExtension : QuPathExtension, GitHubProject {
     syncTrackedChangesMenuItem.disableProperty().bind(enableExtensionProperty.not())
     menu.items.add(syncTrackedChangesMenuItem)
 
-    val refreshPathObjectsMenuItem = MenuItem("Reset from primary data")
+    val refreshPathObjectsMenuItem = MenuItem("Reset from server data")
     refreshPathObjectsMenuItem.onAction = EventHandler { _: ActionEvent? -> createResetFromRemoteStage() }
     refreshPathObjectsMenuItem.disableProperty().bind(enableExtensionProperty.not())
     menu.items.add(refreshPathObjectsMenuItem)
 
-    val saveToRemoteMenuItem = MenuItem("Overwrite remote primary data")
+    val saveToRemoteMenuItem = MenuItem("Overwrite server data")
     saveToRemoteMenuItem.onAction = EventHandler { _: ActionEvent? -> createOverwriteRemote() }
     saveToRemoteMenuItem.disableProperty().bind(enableExtensionProperty.not())
     menu.items.add(saveToRemoteMenuItem)
@@ -155,7 +155,7 @@ class CloudOmeZarrExtension : QuPathExtension, GitHubProject {
   private fun createResetFromRemoteStage() {
     val dialog = Alert(
       Alert.AlertType.CONFIRMATION,
-      "Delete all local path objects and refresh from server?"
+      "Replace all local objects with server data?"
     )
     dialog.showAndWait()
       .filter(Predicate { response: ButtonType? -> response == ButtonType.OK })
@@ -186,7 +186,7 @@ class CloudOmeZarrExtension : QuPathExtension, GitHubProject {
   private fun createOverwriteRemote() {
     val dialog = Alert(
       Alert.AlertType.CONFIRMATION,
-      "Overwrite shared primary copy with local data?"
+      "Overwrite shared server copy with current local data?"
     )
     dialog.showAndWait()
       .filter(Predicate { response: ButtonType? -> response == ButtonType.OK })
