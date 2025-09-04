@@ -16,7 +16,7 @@ import java.awt.image.BufferedImage
 class AnnotationSyncer : QuPathViewerListener, PathObjectHierarchyListener, StoreListener {
   companion object {
     private val logger = org.slf4j.LoggerFactory.getLogger(AnnotationSyncer::class.java)
-    val LAST_CHANGESET_ID = "dimilab.omezarr.lastChangesetId"
+    const val LAST_CHANGESET_ID = "dimilab.omezarr.lastChangesetId"
   }
 
   var remoteStore: CloudStorageStore? = null
@@ -28,13 +28,15 @@ class AnnotationSyncer : QuPathViewerListener, PathObjectHierarchyListener, Stor
   // If true, ignore incoming hierarchy changes.
   var paused: Boolean = false
 
+  var viewerDisplayListener: InvalidationListener? = null
+
   // Called by QuPath when a viewer's image data changes.
   override fun imageDataChanged(
     viewer: QuPathViewer?,
     imageDataOld: ImageData<BufferedImage>?,
     imageDataNew: ImageData<BufferedImage>?,
   ) {
-    logger.info("imageDataChanged: tracking new imageData {}", imageDataNew?.server?.metadata?.getName() ?: "<unknown>")
+    logger.info("imageDataChanged: tracking new imageData {}", imageDataNew?.server?.metadata?.name ?: "<unknown>")
     trackedImage = imageDataNew
 
     trackedHierarchy?.removeListener(this)
@@ -57,7 +59,11 @@ class AnnotationSyncer : QuPathViewerListener, PathObjectHierarchyListener, Stor
     val server = imageDataNew?.server
     if (server is CloudOmeZarrServer && server.serverArgs.changesetRoot != null) {
       val lastChangesetId = (trackedImage?.getProperty(LAST_CHANGESET_ID) as Int?) ?: 0
-      logger.info("Connecting to remote changeset store from position {} at: {}", lastChangesetId, server.serverArgs.changesetRoot)
+      logger.info(
+        "Connecting to remote changeset store from position {} at: {}",
+        lastChangesetId,
+        server.serverArgs.changesetRoot
+      )
       remoteStore = CloudStorageStore(server.serverArgs.changesetRoot, lastSeenChangesetId = lastChangesetId).also {
         it.addListener(this)
         it.syncEvents(blocking = false)
@@ -81,7 +87,7 @@ class AnnotationSyncer : QuPathViewerListener, PathObjectHierarchyListener, Stor
   }
 
   override fun onNewChangesetId(changesetId: Int) {
-    logger.info("Annotation syncer now at changeset ${changesetId}")
+    logger.info("Annotation syncer now at changeset $changesetId")
     trackedImage?.setProperty(LAST_CHANGESET_ID, changesetId)
   }
 
