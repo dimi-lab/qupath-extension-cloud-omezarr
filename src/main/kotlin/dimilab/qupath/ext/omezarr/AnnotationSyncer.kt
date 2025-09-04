@@ -1,6 +1,7 @@
 package dimilab.qupath.ext.omezarr
 
 import dimilab.qupath.pathobjects.changes.*
+import javafx.beans.InvalidationListener
 import qupath.lib.gui.viewer.QuPathViewer
 import qupath.lib.gui.viewer.QuPathViewerListener
 import qupath.lib.images.ImageData
@@ -70,6 +71,21 @@ class AnnotationSyncer : QuPathViewerListener, PathObjectHierarchyListener, Stor
       }
     } else {
       logger.info("Not connecting image without changeset root: ${imageDataNew?.server?.javaClass?.name}")
+    }
+
+    if (server is CloudOmeZarrServer && viewerDisplayListener == null) {
+      logger.info("Connecting image display cache-busting listener")
+      viewerDisplayListener = InvalidationListener {
+        logger.info("Clearing image region store cache")
+        viewer?.imageRegionStore?.cache?.clear()
+      }
+      viewer?.imageDisplay?.changeTimestampProperty()?.addListener(viewerDisplayListener)
+    } else {
+      viewerDisplayListener?.let {
+        logger.info("Disconnecting image display listener")
+        viewer?.imageDisplay?.changeTimestampProperty()?.removeListener(it)
+        viewerDisplayListener = null
+      }
     }
   }
 
@@ -146,6 +162,10 @@ class AnnotationSyncer : QuPathViewerListener, PathObjectHierarchyListener, Stor
   }
 
   override fun viewerClosed(viewer: QuPathViewer?) {
+    viewerDisplayListener?.let {
+      viewer?.imageDisplay?.changeTimestampProperty()?.removeListener(it)
+      viewerDisplayListener = null
+    }
   }
 
 }

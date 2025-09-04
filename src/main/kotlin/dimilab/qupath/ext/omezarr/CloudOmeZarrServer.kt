@@ -10,6 +10,7 @@ import kotlinx.coroutines.runBlocking
 import loci.formats.ome.OMEXMLMetadata
 import org.apache.commons.cli.*
 import qupath.lib.color.ColorModelFactory
+import qupath.lib.gui.QuPathGUI
 import qupath.lib.images.servers.AbstractTileableImageServer
 import qupath.lib.images.servers.ImageServerBuilder
 import qupath.lib.images.servers.ImageServerBuilder.DefaultImageServerBuilder
@@ -236,14 +237,20 @@ class CloudOmeZarrServer(private val zarrBaseUri: URI, vararg args: String) : Ab
       throw IllegalArgumentException("Tile level ${tileRequest.level} out of bounds for ${scaleLevels.size} levels")
     }
 
+    // NOTE: the selectedChannels read mechanism only works because we clear
+    // the region store cache each time the image display changes. Currently,
+    // that happens in the Annotation Syncer (our central listener).
+    val selectedChannels = getSelectedChannels()
+
     logger.debug(
-      "Reading tile x={} y={} width={} height={} level={} channels={}",
+      "Reading tile x={} y={} width={} height={} level={} channels={} selectedChannels={}",
       tileRequest.tileX,
       tileRequest.tileY,
       tileRequest.tileWidth,
       tileRequest.tileHeight,
       tileRequest.level,
-      metadata.channels.size
+      metadata.channels.size,
+      selectedChannels ?: "all",
     )
 
     return renderZarrToBufferedImage(
@@ -254,8 +261,30 @@ class CloudOmeZarrServer(private val zarrBaseUri: URI, vararg args: String) : Ab
       tileRequest.tileWidth,
       tileRequest.tileHeight,
       metadata.pixelType,
-      metadata.channels.size
+      metadata.channels.size,
+      selectedChannels,
     )
+  }
+
+  private fun getSelectedChannels(): Set<Int>? {
+    val imageDisplay = QuPathGUI.getInstance()?.viewer?.imageDisplay
+    val matchedChannels = imageDisplay?.selectedChannels()?.map { it ->
+      val selectedChannel = it.name.substringBeforeLast(" (C")
+      metadata.channels.indexOfFirst { it.name.trim() == selectedChannel.trim() }
+    }?.toSet()
+
+    return matchedChannels.let {
+      if (it?.contains(-1) == true) {
+        logger.warn(
+          "One of display channels {} not found in image channel list {}",
+          imageDisplay?.selectedChannels()?.map { x -> x.name },
+          metadata.channels.map { x -> x.name },
+        )
+        null
+      } else {
+        it
+      }
+    }
   }
 
   override fun readPathObjects(): MutableCollection<PathObject> {

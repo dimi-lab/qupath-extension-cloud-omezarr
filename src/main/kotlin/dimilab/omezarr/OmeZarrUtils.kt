@@ -68,6 +68,16 @@ private fun makeBuffer(width: Int, height: Int, numChannels: Int, pixelType: Pix
   }
 }
 
+fun CoroutineScope.launchZeroReader(
+  raster: WritableRaster,
+  c: Int,
+  width: Int,
+  height: Int,
+) = async {
+  val zeroData = IntArray(width * height) { 0 }
+  raster.setSamples(0, 0, width, height, c, zeroData)
+}
+
 fun CoroutineScope.launchChannelReader(
   zarrArray: ZarrArray,
   raster: WritableRaster,
@@ -122,6 +132,7 @@ fun renderZarrToBufferedImage(
   height: Int,
   pixelType: PixelType,
   numChannels: Int,
+  selectedChannels: Set<Int>?,
 ): BufferedImage {
   val dataBuffer = makeBuffer(width, height, numChannels, pixelType)
   val sampleModel = BandedSampleModel(dataBuffer.dataType, width, height, dataBuffer.numBanks)
@@ -131,7 +142,11 @@ fun renderZarrToBufferedImage(
 
   runBlocking(Dispatchers.IO) {
     val workers = (0 until numChannels).map { c ->
-      launchChannelReader(zarrArray, raster, readShape, c, x, y, width, height)
+      if (selectedChannels == null || c in selectedChannels) {
+        launchChannelReader(zarrArray, raster, readShape, c, x, y, width, height)
+      } else {
+        launchZeroReader(raster, c, width, height)
+      }
     }
 
     workers.awaitAll()
