@@ -76,8 +76,8 @@ class AnnotationSyncer : QuPathViewerListener, PathObjectHierarchyListener, Stor
     if (server is CloudOmeZarrServer && viewerDisplayListener == null) {
       logger.info("Connecting image display cache-busting listener")
       viewerDisplayListener = InvalidationListener {
-        logger.info("Clearing image region store cache")
-        viewer?.imageRegionStore?.cache?.clear()
+        logger.debug("Clearing image region store cache")
+        viewer?.imageRegionStore?.clearCache()
       }
       viewer?.imageDisplay?.changeTimestampProperty()?.addListener(viewerDisplayListener)
     } else {
