@@ -25,6 +25,7 @@ class AnnotationSyncer : QuPathViewerListener, PathObjectHierarchyListener, Stor
   var trackedHierarchy: PathObjectHierarchy? = null
   val changeTracker = Tracker()
   val trackedChanges = mutableListOf<Event>()
+  var selectedChannels = setOf<String>()
 
   // If true, ignore incoming hierarchy changes.
   var paused: Boolean = false
@@ -75,12 +76,18 @@ class AnnotationSyncer : QuPathViewerListener, PathObjectHierarchyListener, Stor
 
     if (server is CloudOmeZarrServer && viewerDisplayListener == null) {
       logger.info("Connecting image display cache-busting listener")
+      selectedChannels = viewer?.imageDisplay?.selectedChannels()?.map { it.name }.orEmpty().toSet()
       viewerDisplayListener = InvalidationListener {
-        logger.debug("Clearing image region store cache")
-        viewer?.imageRegionStore?.clearCache()
+        val newChannels = viewer?.imageDisplay?.selectedChannels()?.map { it.name }?.toSet().orEmpty()
+        if (newChannels != selectedChannels) {
+          logger.debug("Clearing image region store cache")
+          viewer?.imageRegionStore?.clearCache()
+          selectedChannels = newChannels
+        }
       }
       viewer?.imageDisplay?.changeTimestampProperty()?.addListener(viewerDisplayListener)
     } else {
+      selectedChannels = setOf()
       viewerDisplayListener?.let {
         logger.info("Disconnecting image display listener")
         viewer?.imageDisplay?.changeTimestampProperty()?.removeListener(it)
