@@ -68,16 +68,6 @@ private fun makeBuffer(width: Int, height: Int, numChannels: Int, pixelType: Pix
   }
 }
 
-fun CoroutineScope.launchZeroReader(
-  raster: WritableRaster,
-  c: Int,
-  width: Int,
-  height: Int,
-) = async {
-  val zeroData = IntArray(width * height) { 0 }
-  raster.setSamples(0, 0, width, height, c, zeroData)
-}
-
 fun CoroutineScope.launchChannelReader(
   zarrArray: ZarrArray,
   raster: WritableRaster,
@@ -145,7 +135,7 @@ fun renderZarrToBufferedImage(
       if (selectedChannels == null || c in selectedChannels) {
         launchChannelReader(zarrArray, raster, readShape, c, x, y, width, height)
       } else {
-        launchZeroReader(raster, c, width, height)
+        async { /* no-op */ }
       }
     }
 
