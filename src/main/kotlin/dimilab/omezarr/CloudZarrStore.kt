@@ -60,11 +60,11 @@ class CloudZarrStore(val backingStore: Store) : Store {
       val deferredByteArray = synchronized(deferredFetches) {
         val existing = deferredFetches[key]
         if (existing != null) {
-          logger.debug("Waiting for existing fetch for key {}", key)
+          logger.trace("Waiting for existing fetch for key {}", key)
           return@synchronized existing
         }
 
-        logger.debug("Starting new fetch for key {}", key)
+        logger.trace("Starting new fetch for key {}", key)
         val deferred = makeDeferred(key)
         deferredFetches[key] = deferred
         deferred
@@ -91,6 +91,7 @@ class CloudZarrStore(val backingStore: Store) : Store {
         deferredFetches.remove(key)
       }
 
+      logger.debug("Read key {} from backing store ({} bytes)", key, byteArray.size)
       byteArray
     }
   }
