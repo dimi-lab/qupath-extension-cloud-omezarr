@@ -80,7 +80,15 @@ fun CoroutineScope.launchChannelReader(
 ) = async {
   val readOffset = intArrayOf(0, c, 0, y, x)
   logger.trace("Reading shape {} at offset {}", readShape, readOffset)
-  val readData = zarrArray.read(readShape, readOffset)
+
+  val readData = try {
+    zarrArray.read(readShape, readOffset)
+  } catch (e: InterruptedException) {
+    logger.info("Channel read interrupted, returning zeros for channel {}", c)
+    val zeroData = IntArray(width * height) { 0 }
+    raster.setSamples(0, 0, width, height, c, zeroData)
+    return@async
+  }
 
   when (readData) {
     is DoubleArray -> {
