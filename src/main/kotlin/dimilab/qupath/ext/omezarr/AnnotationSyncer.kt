@@ -82,6 +82,7 @@ class AnnotationSyncer : QuPathViewerListener, PathObjectHierarchyListener, Stor
         if (newChannels != selectedChannels) {
           logger.debug("Clearing image region store cache")
           viewer?.imageRegionStore?.clearCache()
+          server.cache?.clear()
           selectedChannels = newChannels
         }
       }

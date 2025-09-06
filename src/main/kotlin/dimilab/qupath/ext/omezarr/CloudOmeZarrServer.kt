@@ -20,6 +20,7 @@ import qupath.lib.images.servers.TileRequest
 import qupath.lib.io.PathIO
 import qupath.lib.objects.PathObject
 import qupath.lib.objects.PathObjectReader
+import qupath.lib.regions.RegionRequest
 import java.awt.image.BufferedImage
 import java.awt.image.ColorModel
 import java.io.IOException
@@ -264,6 +265,10 @@ class CloudOmeZarrServer(private val zarrBaseUri: URI, vararg args: String) : Ab
       metadata.channels.size,
       selectedChannels,
     )
+  }
+
+  public override fun getCache(): MutableMap<RegionRequest?, BufferedImage?>? {
+    return super.getCache()
   }
 
   private fun getSelectedChannels(): Set<Int>? {
