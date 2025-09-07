@@ -81,16 +81,7 @@ fun CoroutineScope.launchChannelReader(
   val readOffset = intArrayOf(0, c, 0, y, x)
   logger.trace("Reading shape {} at offset {}", readShape, readOffset)
 
-  val readData = try {
-    zarrArray.read(readShape, readOffset)
-  } catch (e: InterruptedException) {
-    logger.info("Channel read interrupted, returning zeros for channel {}", c)
-    val zeroData = IntArray(width * height) { 0 }
-    raster.setSamples(0, 0, width, height, c, zeroData)
-    return@async
-  }
-
-  when (readData) {
+  when (val readData = zarrArray.read(readShape, readOffset)) {
     is DoubleArray -> {
       raster.setSamples(0, 0, width, height, c, readData)
     }
@@ -128,6 +119,7 @@ fun renderZarrToBufferedImage(
   y: Int,
   width: Int,
   height: Int,
+  level: Int,
   pixelType: PixelType,
   numChannels: Int,
   selectedChannels: Set<Int>?,
@@ -138,16 +130,29 @@ fun renderZarrToBufferedImage(
 
   val readShape = intArrayOf(1, 1, 1, height, width)
 
-  runBlocking(Dispatchers.IO) {
-    val workers = (0 until numChannels).map { c ->
-      if (selectedChannels == null || c in selectedChannels) {
-        launchChannelReader(zarrArray, raster, readShape, c, x, y, width, height)
-      } else {
-        async { /* no-op */ }
+  try {
+    runBlocking(Dispatchers.IO) {
+      val workers = (0 until numChannels).map { c ->
+        if (selectedChannels == null || c in selectedChannels) {
+          launchChannelReader(zarrArray, raster, readShape, c, x, y, width, height)
+        } else {
+          async { /* no-op */ }
+        }
       }
-    }
 
-    workers.awaitAll()
+      workers.awaitAll()
+    }
+  } catch (e: InterruptedException) {
+    // Leave the interrupt alone: return the image as read so far.
+    logger.info(
+      "Interrupted while reading x={} y={} width={} height={} level={} channels={}",
+      x,
+      y,
+      width,
+      height,
+      level,
+      selectedChannels ?: "all",
+    )
   }
 
   return BufferedImage(colorModel, raster, false, null)
