@@ -261,6 +261,7 @@ class CloudOmeZarrServer(private val zarrBaseUri: URI, vararg args: String) : Ab
       tileRequest.tileY,
       tileRequest.tileWidth,
       tileRequest.tileHeight,
+      tileRequest.level,
       metadata.pixelType,
       metadata.channels.size,
       selectedChannels,
