@@ -47,6 +47,7 @@ class AnnotationSyncer : QuPathViewerListener, PathObjectHierarchyListener, Stor
     if (remoteStore != null) {
       logger.info("Disconnecting from remote store at: {}", remoteStore?.changesetRoot()?.gsUri)
       remoteStore?.removeListener(this)
+      remoteStore?.stopPolling()
       remoteStore = null
     }
 
@@ -68,7 +69,7 @@ class AnnotationSyncer : QuPathViewerListener, PathObjectHierarchyListener, Stor
       )
       remoteStore = CloudStorageStore(server.serverArgs.changesetRoot, lastSeenChangesetId = lastChangesetId).also {
         it.addListener(this)
-        it.syncEvents(blocking = false)
+        it.startPolling()
       }
     } else {
       logger.info("Not connecting image without changeset root: ${imageDataNew?.server?.javaClass?.name}")
