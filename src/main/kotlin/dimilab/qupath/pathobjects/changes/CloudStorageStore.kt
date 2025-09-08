@@ -11,11 +11,12 @@ import kotlinx.coroutines.*
 import org.slf4j.LoggerFactory
 import java.net.URI
 import java.nio.charset.StandardCharsets
-import java.util.SortedMap
+import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 import kotlin.math.max
+import kotlin.math.min
 
 interface StoreListener {
   fun onNewEvents(events: List<Event>)
@@ -37,6 +38,8 @@ class CloudStorageStore {
   private val currentSyncLock = ReentrantLock()
   private var currentSync: Deferred<Unit>? = null
   private val writeQueue = mutableListOf<Event>()
+
+  var pollingJob: Job? = null
 
   private val lastSeenChangesetLock = ReentrantLock()
   var lastSeenChangesetId: Int = 0
@@ -149,6 +152,40 @@ class CloudStorageStore {
     CoroutineScope(ioDispatcher).launch {
       eventsWriteThread()
     }
+  }
+
+  fun startPolling() {
+    stopPolling()
+    pollingJob = CoroutineScope(ioDispatcher).launch {
+      var foundDuringPoll = false
+      addListener(object : StoreListener {
+        override fun onNewEvents(events: List<Event>) {
+          foundDuringPoll = true
+        }
+
+        override fun onNewChangesetId(changesetId: Int) {}
+      })
+      var delayMs = 2_500L
+      logger.info("Starting polling job")
+      while (isActive) {
+        foundDuringPoll = false
+        logger.debug("Polling for new events")
+        syncEvents(blocking = true)
+
+        // When we find remote events (meaning somebody else is writing
+        // them) poll more frequently. Back off over time.
+        delayMs = if (foundDuringPoll) 2_500 else min(90_000, delayMs * 2)
+
+        logger.debug("Next poll in {} ms", delayMs)
+        delay(delayMs)
+      }
+      logger.info("Exiting polling job")
+    }
+  }
+
+  fun stopPolling() {
+    pollingJob?.cancel()
+    pollingJob = null
   }
 
   private fun eventsWriteThread() {
