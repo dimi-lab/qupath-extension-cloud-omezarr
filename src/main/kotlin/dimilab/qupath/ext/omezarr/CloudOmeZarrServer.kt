@@ -274,6 +274,13 @@ class CloudOmeZarrServer(private val zarrBaseUri: URI, vararg args: String) : Ab
 
   private fun getSelectedChannels(): Set<Int>? {
     val imageDisplay = QuPathGUI.getInstance()?.viewer?.imageDisplay
+
+    if (imageDisplay?.imageData?.server != this) {
+      // The image display is not currently displaying this image, so don't
+      // use it for channels. This happens in thumbnail mode for example.
+      logger.debug("Skipping selected channels optimization because image display is not showing this server")
+      return null
+    }
     val matchedChannels = imageDisplay?.selectedChannels()?.map { it ->
       val selectedChannel = it.name.substringBeforeLast(" (C")
       metadata.channels.indexOfFirst { it.name.trim() == selectedChannel.trim() }
