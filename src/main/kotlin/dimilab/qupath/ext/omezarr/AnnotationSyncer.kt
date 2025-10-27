@@ -2,6 +2,7 @@ package dimilab.qupath.ext.omezarr
 
 import dimilab.qupath.pathobjects.changes.*
 import javafx.beans.InvalidationListener
+import qupath.lib.gui.QuPathGUI
 import qupath.lib.gui.viewer.QuPathViewer
 import qupath.lib.gui.viewer.QuPathViewerListener
 import qupath.lib.images.ImageData
@@ -107,6 +108,10 @@ class AnnotationSyncer : QuPathViewerListener, PathObjectHierarchyListener, Stor
     val oldPaused = this.paused
     this.paused = true
     Applier.applyEventsToHierarchy(events, trackedHierarchy)
+    // Don't allow undo/redo through a changeset download.
+    // Ideally, we would disable undo manager using its private state
+    // just for the duration of this event application.
+    QuPathGUI.getInstance().undoRedoManager.clear()
     this.paused = oldPaused
     changeTracker.retrackObjects(events.map { it.id }.toSet(), trackedHierarchy)
   }
