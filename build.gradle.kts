@@ -7,6 +7,29 @@ plugins {
   id("qupath-conventions")
 
   kotlin("jvm") version "2.1.10"
+  `maven-publish`
+}
+
+java {
+  withSourcesJar()
+}
+
+publishing {
+  publications {
+    create<MavenPublication>("maven") {
+      from(components["java"])
+    }
+  }
+  repositories {
+    maven {
+      name = "GitHubPackages"
+      url = uri("https://maven.pkg.github.com/${System.getenv("GITHUB_REPOSITORY")}")
+      credentials {
+        username = System.getenv("GITHUB_ACTOR")
+        password = System.getenv("GITHUB_TOKEN")
+      }
+    }
+  }
 }
 
 repositories {
