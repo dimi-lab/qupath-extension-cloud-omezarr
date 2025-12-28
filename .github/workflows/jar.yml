@@ -39,33 +39,6 @@ jobs:
           name: extension-jars
           path: build/libs/*.jar
 
-  package:
-    needs: build-jars
-    name: Publish to GH Packages
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-    steps:
-      - name: Checkout sources
-        uses: actions/checkout@v4
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: 21
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
-      - name: Download artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: extension-jars
-          path: build/libs
-      - name: Publish to GitHub Packages
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        run: ./gradlew publish
-
   release:
     needs: build-jars
     name: Draft release
@@ -93,3 +66,24 @@ jobs:
               --target ${{ github.sha }} \
               --title "Development build ${{ steps.date.outputs.date }}" \
               *.jar
+
+  build-and-package:
+    name: Build & publish to GH Packages
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 21
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+      - name: Publish to GitHub Packages
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: ./gradlew publish
