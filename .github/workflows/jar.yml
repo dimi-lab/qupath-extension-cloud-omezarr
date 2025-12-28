@@ -64,7 +64,7 @@ jobs:
       - name: Publish to GitHub Packages
         env:
           GITHUB_TOKEN: ${{ github.token }}
-        run: ./gradlew publish -x compileJava -x compileKotlin -x processResources -x jar -x sourcesJar -x shadowJar
+        run: ./gradlew publish
 
   release:
     needs: build-jars
