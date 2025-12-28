@@ -19,7 +19,7 @@ on:
 
 jobs:
   build-jars:
-    name: build-jars
+    name: Build JARs
     runs-on: ubuntu-latest
     steps:
       - name: Checkout sources
@@ -41,7 +41,7 @@ jobs:
 
   package:
     needs: build-jars
-    name: Package and publish
+    name: Publish to GH Packages
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -56,6 +56,11 @@ jobs:
           java-version: 21
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: extension-jars
+          path: build/libs
       - name: Publish to GitHub Packages
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -74,7 +79,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           merge-multiple: true
-          pattern: extension-jars
+          name: extension-jars
 
       - name: Get current date
         id: date
